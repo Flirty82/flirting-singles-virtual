@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    function hasMinMembership(level) {
+      let levels = ['free', 'gold', 'platinum', 'diamond'];
+      let userLevel = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipLevel;
+      return levels.index(userLevel) >= levels.index(level);
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || request.auth.token.admin == true;
+      allow delete: if request.auth.token.admin == true;
+    }
+    
+    // Posts collection
+    match /posts/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) || request.auth.token.admin == true;
+    }
+    
+    // Messages collection
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() && 
+        (resource.data.senderId == request.auth.uid || 
+         resource.data.recipientId == request.auth.uid);
+      allow create: if isAuthenticated() && 
+        request.resource.data.senderId == request.auth.uid;
+      allow update: if false; // Messages cannot be edited
+      allow delete: if isOwner(resource.data.senderId);
+    }
+    
+    // Memberships collection
+    match /memberships/{membershipId} {
+      allow read: if isOwner(resource.data.userId) || request.auth.token.admin == true;
+      allow create: if isAuthenticated();
+      allow update: if request.auth.token.admin == true;
+      allow delete: if request.auth.token.admin == true;
+    }
+    
+    // Payments collection
+    match /payments/{paymentId} {
+      allow read: if isOwner(resource.data.userId) || request.auth.token.admin == true;
+      allow create: if isAuthenticated();
+      allow update: if request.auth.token.admin == true;
+      allow delete: if false; // Payments cannot be deleted
+    }
+  }
+}

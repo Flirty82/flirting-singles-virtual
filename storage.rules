@@ -1,0 +1,42 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+    
+    function isValidSize() {
+      return request.resource.size < 50 * 1024 * 1024; // 50MB max
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isImage() && isValidSize();
+    }
+    
+    // User videos
+    match /users/{userId}/videos/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isVideo() && isValidSize();
+    }
+    
+    // Post media
+    match /posts/{postId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (isImage() || isVideo()) && isValidSize();
+    }
+  }
+}

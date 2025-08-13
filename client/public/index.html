@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico"C:\Users\flirt\OneDrive\Documents\logo.png />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ff69b4" />
+    <meta name="description" content="Online dating + social networking webapp"/>
+    <meta name="keywords" content="dating, social networking, flirt, love"/>
+
+    <meta property="og:title" content="FlirtingSingles"/>
+    <meta property="og:description" content="Find your perfect match with virtual dating and more"/>
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.png"/>
+    <meta property="og:url" content="flirting-singles-virtual-ab760"/>
+    <meta property="og:type" content="website"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="FlirtingSingles - Dating/Social Networking"/>
+    <meta name="twitter:description" content="Meet, flirt, and connect with several unique features, use our feedback feature to watch your ideas come to life!"/>
+    <meta name="twitter:image" content="%PUBLIC_URL"/>
+
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>
+
+
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://www.paypal.com">
+    <link rel="preconnect" href="https://firebase.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <title>Flirting Singles</title>
+
+    <style>
+      :root {
+        --primary: $ff69b4;
+        --secondary-color: #9370db;
+        --accent-color: #ffd700;
+        --background-dark: #000000;
+        --background-purple: #2d1b3d;
+        --text-white: #ffffff;
+        --text-gray: #cccccc;
+        --text-light-gray: #888888;
+        --border-color: #rgba(225, 105, 180, 0.3);
+        --card-background: rgba(255, 255, 255, 0.05);
+        --gradient-primary: linear-gradient(45deg, #ff69b4, #9370db);
+        --gradient-background: linear-gradient(135deg, #000000 0%, #2d1b3d 50%, #00000 100%);
+        --shadow-glow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        --border-radius: 15px;
+        --border-radius-small: 8px;
+        --transition: all 0.3s ease;
+      }
+
+      /*Global Reset and Base Styles*/
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: var(--gradient-background);
+        color: var(--text-white);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /*Loading Screen Styles*/
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--gradient-background);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility -.5s ease;
+      }
+
+      .loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loading-logo {
+        font-size: 3rem;
+        font-weight: bold;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 2rem;
+        animation: pulse 2s infinite;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid transparent;
+        border-top: 3px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      /*Scrollbar Customization*/
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--gradient-primary);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+      }
+
+      /*Hide loading screen after app loads*/
+      .app-loaded .loading-screen {
+        opacity: 0;
+        visibility: visible;
+      }
+      [data-custom-class="body"], [data-custom-class="body"]*
+    </style>
+    <script src="https://app.termly.io/resource-blocker|c469004f-eb87-4a64-b641"></script>
+  </head>
+  <body>
+    <div name="termly-embed" data-id="1971e635-bd4-410d-9347-e5a706fc3964"></div>
+    <div name="termly-embed" data-id="d1fdc104-8dc0-47d7-b73a-16483a2974ef"></div>
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-logo">Flirting Singles</div>
+      <div class="loading-spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-gray);">Connecting hearts...</p>
+    </div>
+
+    <div id="root"></div>
+
+    <script>
+      window.addEventListener('load', function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        const root = document.getElementById('root');
+
+        const checkAppLoad = setInterval(function() {
+          if (root.children.length > 0) {
+            loadingScreen.classList.add('hidden');
+            document.body.classList.add('app-loaded');
+            clearInterval(checkAppLoad);
+          }
+        }, 100);
+
+        setTimeout(function() {
+          loadingScreen.classList.add('hidden');
+          document.body.classList.add('app-loaded');
+          clearInterval(checkAppLoad);
+        }, 5000);
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('SW registered: ', registration);
+          })
+          .catch(function(registrationError) {
+            console.log('Sw registration failed:', registrationError);
+          });
+        });
+      }
+
+      window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error);
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+      });
+    </script>
+    <br><br>
+    <main>
+      <title>Flirting Singles-Dating & Social Network</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.4/babel.min.js"></script>
+     00px;
+        
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Flirting Singles - Dating & Social Network</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.4/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #2d1b3d 50%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #ff69b4;
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff69b4, #9370db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: linear-gradient(45deg, #ff69b4, #9370db);
+            transform: translateY(-2px);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #ff69b4, #9370db);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #ff69b4;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Home Page */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: radial-gradient(circle, rgba(255,105,180,0.1) 0%, transparent 70%);
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff69b4, #9370db, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #cccccc;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff69b4;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Forms */
+        .form-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ff69b4;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+        }
+        
+        /* Membership Cards */
+        .membership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .membership-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .membership-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .membership-card.free {
+            border: 2px solid #808080;
+        }
+        
+        .membership-card.gold {
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+        }
+        
+        .membership-card.platinum {
+            border: 2px solid #e5e4e2;
+            background: linear-gradient(135deg, rgba(229, 228, 226, 0.1), rgba(229, 228, 226, 0.05));
+        }
+        
+        .membership-card.diamond {
+            border: 2px solid #b9f2ff;
+            background: linear-gradient(135deg, rgba(185, 242, 255, 0.1), rgba(185, 242, 255, 0.05));
+        }
+        
+        .membership-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .membership-price {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Activity Feed */
+        .activity-feed {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .post-form {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .post-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            resize: vertical;
+        }
+        
+        .post {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #ff69b4;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff69b4, #9370db);
+            margin-right: 1rem;
+        }
+        
+        .post-user {
+            font-weight: bold;
+            color: #ff69b4;
+        }
+        
+        .post-time {
+            color: #888;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            height: 60vh;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .chat-sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-right: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .chat-user {
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .chat-user:hover {
+            background: rgba(255, 105, 180, 0.2);
+        }
+        
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        
+        .message.sent {
+            background: linear-gradient(45deg, #ff69b4, #9370db);
+            margin-left: auto;
+        }
+        
+        .message.received {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        .chat-input input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 25px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .chat-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Navigation Component
+        const Navigation = ({ currentPage, setCurrentPage, isLoggedIn, setIsLoggedIn }) => {
+            return (
+                <nav className="navbar">
+                    <div className="nav-content">
+                        <div className="logo">LoveConnect</div>
+                        <ul className="nav-links">
+                            <li><a href="#" onClick={() => setCurrentPage('home')}>Home</a></li>
+                            <li><a href="#" onClick={() => setCurrentPage('memberships')}>Memberships</a></li>
+                            <li><a href="#" onClick={() => setCurrentPage('contact')}>Contact</a></li>
+                            {isLoggedIn && (
+                                <>
+                                    <li><a href="#" onClick={() => setCurrentPage('feed')}>Activity Feed</a></li>
+                                    <li><a href="#" onClick={() => setCurrentPage('chat')}>Chat</a></li>
+                                </>
+                            )}
+                        </ul>
+                        <div className="auth-buttons">
+                            {!isLoggedIn ? (
+                                <>
+                                    <button className="btn btn-secondary" onClick={() => setCurrentPage('login')}>Login</button>
+                                    <button className="btn btn-primary" onClick={() => setCurrentPage('signup')}>Sign Up</button>
+                                </>
+                            ) : (
+                                <button className="btn btn-secondary" onClick={() => setIsLoggedIn(false)}>Logout</button>
+                            )}
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+    
