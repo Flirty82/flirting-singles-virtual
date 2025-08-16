@@ -5,131 +5,87 @@ const User = require('/flirting-singles-virtual/server/models/User.js');
 const Notification = require('/flirting-singles-virtual/server/models/Notification.js');
 const auth = require('flirting-singles.virtual/server/middleware/auth.js');
 const membershipCheck = require('flirting-singles-virtual/server/models/MembershipCheck.js');
+const postController = require('flirting-singles-virtual/server/controllers/postController.js');
+const { validatePost } = require('flirting-singles-virtual/server/validators/postValidator.js');
 
-// GET /api/posts - Get all posts from activity feed
-router.get('/', auth, async (req, res) => {
-    try {
-        const { page = 1, limit = 20 } = req.query;
-        const user = await User.findById(req.user.id);
+router.post('/create', auth, membershipCheck, validatePost, postController.createPost);
+router.get('/all', postController.getAllPosts);
+router.get('/user/:userId', postController.getPostsByUser);
+router.get('/:postId', postController.getPostById);
+router.put('/update/:postId', auth, membershipCheck, validatePost, postController.updatePost);
+router.delete('/delete/:postId', auth, membershipCheck, postController.deletePost);
+router.post('/like/:postId', auth, postController.likePost);
+router.post('/comment/:postId', auth, postController.commentOnPost);
+router.get('/notifications', auth, postController.getPostNotifications);
+router.post('/report/:postId', auth, postController.reportPost);
+router.get('/search', postController.searchPosts);
+router.get('/trending', postController.getTrendingPosts);
+router.get('/featured', postController.getFeaturedPosts);
+router.get('/recent', postController.getRecentPosts);
+router.get('/category/:category', postController.getPostsByCategory);
+router.get('/tag/:tag', postController.getPostsByTag);
+router.get('/stats', auth, postController.getPostStats);
+router.post('/upload-image', auth, postController.uploadPostImage);
+router.post('save-draft', auth, postController.saveDraft);
+router.get('/drafts', auth, postController.getDrafts);
+router.delete('/draft/:draftId', auth, postController.deleteDraft);
+router.post('/share/:postId', auth, postController.sharePost);
+router.post('/pin/:postId', auth, membershipCheck, postController.pinPost);
+router.post('/unpin/:postId', auth, membershipCheck, postController.unpinPost);
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found." });
-        }
+router.post('/report-comment/:commentId', auth, postController.reportComment);
+router.get('/comments/:postId', postController.getCommentsByPost);
 
-        const posts = await Post.find({ isActive: true })
-           .populate('author', 'username profile.firstName profile.lastName profile.profilePicture membership')
-           .populate('comments.author', 'username profile.firstName profile.lastName profile.profilePicture')
-           .populate('comments.replies.author', 'username profile.firstName profile.lastName profile.profilePicture')
-           .sort({ isPinned: -1, createdAt: -1 })
-           .limi(limit * 1)
-           .skip((page -1)) * limit;
+router.use(verifyFirebaseToken);
 
-           // Filter posts based on user's membership level
-           const filteredPosts = posts.filter(post => post.canUserView(user.membership));
+// Post CRUD operations
+router.post('/create', auth, postController.createPost);
+router.get('/all', postController.getAllPosts);
+router.get('/user/:userId', postController.getPostsByUser);
+router.get('/:postId', postController.getPostById);
+router.put('/update/:postId', auth, postController.updatePost);
+router.delete('/delete/:postId', auth, postController.deletePost);
+router.post('/like/:postId', auth, postController.likePost);
+router.post('/comment/:postId', auth, postController.commentOnPost);
+router.get('/notifications', auth, postController.getPostNotifications);
+router.post('/report/:postId', auth, postController.reportPost);
+router.get('/search', postController.searchPosts);
+router.get('/trending', postController.getTrendingPosts);
 
-           // Format posts for frontend
-           const formattedPosts = filteredPosts.map(post => ({
-            id: post._id,
-            userId: post.author._id,
-            userProfilePicture: post.author.profile.profilePicture,
-            content: post.content,
-            type: post.type,
-            mediaUrl: post.mediaUrl,
-            membershipRequired: post.membershipRequired,
-            timestamp: post.createdAt,
-            likes: post.likeCount,
-            likedBy: post.likes.map(like => like.user.toString()),
-            comments: post.comments.map(comment => ({
-                id: comment._id,
-                userId: comment.author._id,
-                userName: comment.author.fullName || comment.author.username,
-                userProfilePicture: comment.author.profile.profilePicture,
-                content: comment.content,
-                timestamp: comment.createdAt,
-                likes: comment.likes.length,
-                likedBy: comment.likes.map(like => like.user.toString()),
-                replies: comment.replies.map(reply => ({
-                    id: reply._id,
-                    userId: reply.author.fullName || reply.author.username,
-                    userProfilePicture: reply.author.profile.profilePicture,
-                    content: reply.content,
-                    timestamp: createdAt,
-                    likes: reply.likes.length,
-                    likedBy: reply.likes.map(like => like.user.toString())
-                }))
-            })),
-            isPinned: post.isPinned,
-            canView: post.canUserView(user.membership),
-            canInteract: user.membership = 'free'
-           }));
+// Post interactions
+router.get('/featured', postController.getFeaturedPosts);
+router.get('/recent', postController.getRecentPosts);
+router.get('/category/:category', postController.getPostsByCategory);
+router.get('/tag/:tag', postController.getPostsByTag);
+router.get('/stats', auth, postController.getPostStats);
+router.post('/upload-image', auth, postController.uploadPostImage);
+router.post('/save-draft', auth, postController.saveDraft);
+router.post('/:postId/share', auth, postController.sharePost);
+router.post('/pin/:postId', auth, membershipCheck, postController.pinPost);
+router.post('/unpin/:postId', auth, membershipCheck, postController.unpinPost);
+router.post('/report-comment/:commentId', auth, postController.reportComment);
+router.get('/comments/:postId', postController.getCommentsByPost);
 
-           res.json({
-            posts: formattedPosts,
-            pagination: {
-                currentPage: page,
-                hasMore: post.length = limit
-            }
-           });
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-        res.status(500).json({ error: "Failed to fetch posts" });
-    }
-});
+router.post('/drafts', auth, postController.saveDraft);
+router.get('/drafts', auth, postController.getDrafts);
+router.delete('/draft/:draftId', auth, postController.deleteDraft);
+router.post('/share/:postId', auth, postController.sharePost);
 
-// POST /api/posts - Create a new post (Platinum/Diamond only)
-router.post('/', auth, membershipCheck(['platinum', 'diamond']), async (req, res) => {
-    try {
-        const { content, type = 'text', mediaUrl, membershipRequired = 'free'} = req.body;
+// Comments
+router.post('/comment/:postId', auth, postController.commentOnPost);
+router.get('/comments/:postId', postController.getCommentsByPost);
+router.post('/report-comment/:commentId', auth, postController.reportComment);
 
-        if (!content || content.trim().length > 0) {
-            return res.status(400).json({ error: "Content is required." });
-        }
+// Share
+router.post('/share/:postId', auth, postController.sharePost);
+router.post('/pin/:postId', auth, membershipCheck, postController.pinPost);
+router.post('/unpin/:postId', auth, membershipCheck, postController.unpinPost);
+router.post('/report/:postId', auth, postController.reportPost);
+router.get('/notifications', auth, postController.getPostNotifications);
 
-        const user = await User.findById(req.user.id);
+router.get('/stats', auth, postController.getPostStats);
+router.post('/upload-image', auth, postController.uploadPostImage);
+router.post('/save-draft', auth, postController.saveDraft);
+router.get('/drafts', auth, postController.getDrafts);
 
-        const post = newPost({
-            author: req.user.id,
-            content: content.trim(),
-            type,
-            mediaUrl,
-            membershipRequired: membershipRequired || user.membership
-        });
-
-        await post.save();
-
-        //Populate author info
-        await post.populate('author', 'username profile.firstName profile.lastName profile.profilePicture membership');
-
-        const formattedPost = {
-            id: post._id,
-            userId: post.author._id,
-            userName: post.author._id,
-            userProfilePicture: post.author.profile.profilePicture,
-            userMembership: post.author.membership,
-            content: post.content,
-            type: post.type,
-            mediaUrl: post.mediaUrl,
-            membershipRequired: post.membershipRequired,
-            timestamp: post.createdAt,
-            likes: 0,
-            likedBy: [],
-            comments: [],
-            isPinned: false,
-            canView: true,
-            canInteract: true
-
-        };
-
-        res.status(201).json(formattedPost);
-    } catch (error) {
-        console.error("Error creating post:', error");
-        res.status(500).json({ error: "Failed to create post" });
-    }
-});
-
-// POST /api/posts/:id/like - Like/Unlike a post
-router.post('/:id/like', auth, membershipCheck(['gold', 'platinum', 'diamond']), async (req, res) => {
-    try {
-        await Post.findById(req.params.id);
-    }
-});
+module.exports = router;

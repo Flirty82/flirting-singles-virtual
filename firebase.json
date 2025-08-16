@@ -1,35 +1,33 @@
 {
   "hosting": {
-    "public": "client/build",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "public": "build",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/",
         "destination": "/index.html"
-      }
-    ],
-    "headers": [
+      },
       {
-        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=7200"
-          }
-        ]
+        "source": "/contact",
+        "destination": "/contact.html"
+      },
+      {
+        "source": "/about",
+        "destination": "/about.html"
+      },
+      {
+        "source": "/privacy",
+        "destination": "/privacy.html"
+      },
+      {
+        "source": "/terms",
+        "destination": "/terms.html"
       }
     ]
+
   },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "storage": {
-    "rules": "storage.rules"
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs16"
   }
 }
-

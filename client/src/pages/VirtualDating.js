@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
-import VirtualBingo from '../components/games/VirtualBingo';
+import VirtualBingo from '../../components/games/VirtualBingo';
 import VirtualKaraoke from '../components/games/VirtualKaraoke';
 import io from 'socket.io-client';
 

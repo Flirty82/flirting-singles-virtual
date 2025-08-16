@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -89,14 +90,7 @@ const theme = createTheme({
         },
       },
     }},
-
-    // PayPal configuration
-    const paypalOptions = {
-      'client-id': process.env.REACT_APP_PAYPAL_CLIENT_ID,
-      currency: 'USD',
-      intent: 'capture',
-      components: 'buttons, funding-eligibility',
-    };
+);
 
     // Root element
     root.render(
@@ -150,6 +144,7 @@ const theme = createTheme({
         getTTFB(console.log);
       });
     }
+    
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -5,12 +5,24 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useAuth } from './context/AuthContext';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import RoutesContainer from './RoutesContainer';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './hooks/useAuth';
+import Navbar from './components/Navigation/Navbar';
 
 // Components
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import PrivateRoute from './components/common/PrivateRoute';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import Messages from './pages/Messages';
+import Settings from './pages/Settings';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 // Pages
 import Home from './pages/Home';
@@ -22,6 +34,114 @@ import Memberships from './pages/Memberships';
 import Contact from './pages/Contact';
 import Messages from './pages/Messages';
 import VirtualDating from './pages/VirtualDating';
+
+// Styles
+import './styles/globals.css';
+import './styles/variables.css';
+import './styles/components.css';
+
+// Protected Route Component
+const ProtectiveRoute = ({ children }) => {
+    const { currentUser } = useAuth();
+
+    if (loading) {
+        return <LoadingSpinner fullScreen />;
+    }
+
+    return currentUser ? children : <Navigate to="/Login" />;
+};
+
+// Public Route Component (redirect if authenticated)
+const PublicRoute = ({ children }) => {
+    const { currentUser } = useAuth();
+
+    if (loading) {
+        return <LoadingSpinner fullScreen />;
+    }
+
+    return !currentUser ? children : <Navigate to="/dashboard" />;
+};
+
+function AppComponent() {
+    const { currentUser, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="app-loading">
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    return (
+        <div className="app">
+            {currentUser && <Navbar />}
+            <main className={'main-content ${currentUser ? "with-navbar" : ""}'}>
+                <Routes>
+                    {/*Public Routes*/}
+                    <Route path="/" element={<PulicRoute>
+                        <Home />
+                    </PulicRoute>
+                    }/>
+                    <Route path="login" element={<PublicRoute>
+                        <Login />
+                    </PublicRoute>}/>
+                    <Route path="signup" element={<PublicRoute>
+                        <Signup />
+                    </PublicRoute>}/>
+
+                    {/*Protected Routes*/}
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                       path="/profile/:userId?"
+                       element={
+                        <ProtectedRoute>
+                            <Proifle />
+                        </ProtectedRoute>
+                       }
+                    />
+                    <Route
+                        path="/messages"
+                        element={
+                            <ProtectedRoute>
+                                <Messages />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                       path="settings"
+                       element={
+                        <ProtectedRoute>
+                            <Settings />
+                        </ProtectedRoute>
+                       }
+                    />
+                    
+                    {/*Catch all route*/}
+                    <Route path="*" element={<Navigate to={currentUser ? "/dashboard" : "/"}/>} />
+
+                </Routes>
+            </main>
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <AuthProvider>
+            <Router>
+                <AppContent />
+            </Router>
+        </AuthProvider>
+    );
+}
 
 // Theme configuration
 const theme = createTheme({
@@ -56,6 +176,12 @@ const theme = createTheme({
         borderRadius: 12,
     }
 });
+
+const paypalOptions = {
+    "client-id": process.env.REACT_APP_PAYPAY_CLIENT_ID,
+    currency: "USD",
+    intent: "subscription",
+};
 
 function App() {
     const { user, loading } = useAuth();
