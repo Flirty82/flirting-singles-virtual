@@ -1,9 +1,102 @@
 {
   "name": "flirting-singles-virtual-client",
+  "version": "1.0.0",
+  "description": "Client for the Flirting Singles Virtual application",
+  "main": "index.js",
   "private": true,
   "scripts": {
-  "version": "1.0.0",
-  "description": "A virtual network and online dating platform for Flirting Singles",
-  "main": "index.js",
-  
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "text": "react-scripts test",
+    "eject": "react-scripts eject",
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "lint": "eslint 'src/**/*.{js,jsx}' --quiet",
+    "lint-fix": "eslint 'src/**/*.{js,jsx}' --quiet --fix"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@mui/material": "^5.0.0",
+    "@paypal/react-paypal-js": "^7.0.0",
+    "@reduxjs/toolkit": "^1.9.0",
+    "@tanstack/react-query": "^4.0.0",
+    "autoprefixer": "^10.4.0",
+    "axios": "^1.11.0",
+    "date-fns": "^2.28.0",
+    "emoji-picker-react": "^4.0.0",
+    "firebase": "^12.1.0",
+    "framer-motion": "^11.0.5",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.263.1",
+    "mapbox-gl": "^2.6.1",
+    "postcss": "^8.4.0",
+    "react": "^18.2.0",
+    "react-confetti": "^6.0.0",
+    "react-datepicker": "^4.0.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-helmet-async": "^1.0.0",
+    "react-hook-form": "^7.34.0",
+    "react-hot-toast": "^2.4.0",
+    "react-image-crop": "^10.0.0",
+    "react-infinite-scroll-component": "^5.0.0",
+    "react-lazy-load-image-component": "^1.0.0",
+    "react-map-gl": "^6.1.0",
+    "react-player": "^2.9.0",
+    "react-query": "^3.39.2",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "^5.0.1",
+    "react-select": "^5.2.0",
+    "react-spring": "^9.4.5",
+    "react-three/fiber": "^8.13.2",
+    "react-three/drei": "^9.56.4",
+    "react-webcam": "^7.0.0",
+    "recordrtc": "^5.6.2",
+    "redux": "^4.2.0",
+    "socket.io-client": "^4.5.0",
+    "swiper": "^11.0.6",
+    "tailwindcss": "^3.0.0",
+    "tailwind/forms": "^0.5.3",
+    "tailwind/line-clamp": "^0.4.0",
+    "tailwind/aspect-ratio": "^0.4.0",
+    "three": "^0.150.1",
+    "tone": "^14.7.77",
+    "uuid": "^9.0.0",
+    "@tailwindcss/typography": "^0.5.9",
+    "yup": "^0.32.11",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "web-vitals": "^3.1.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.191",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/three": "^0.150.1",
+    "types/uuid": "^9.0.1",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.28.0",
+    "react-scripts": "^0.0.0",
+    "source-map-explorer": "^2.5.2"
+  },
+  "proxy": "http://localhost:5000"
 }

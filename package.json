@@ -2,6 +2,8 @@
     "name": "flirting-singles-virtual",
     "version": "1.0.0",
     "description": "Online dating and social networking platform",
+    "main": "index.js",
+    "private": true,
     "scripts": {
         "dev": "concurrently \"npm run server\" \"npm run client\"",
         "server": "cs server && npm ren dev",
@@ -12,10 +14,25 @@
         "install-all": "npm run install-server && npm run install-client",
         "deploy": "cd client && npm run build && firebase deploy"
     },
+    "keywords": [
+        "dating",
+        "social-networking",
+        "virtual-network",
+        "flirting-singles",
+        "online-dating",
+        "react",
+        "nodejs",
+        "express",
+        "firebase",
+        "concurrently"
+    ],
     "devDependencies": {
         "concurrently": "^8.2.0"
     },
     "engines": {
-        "node": ">18.0.0"
-    }
+        "node": ">18.0.0",
+        "npm": ">9.0.0"
+    },
+    "author": "Amy Standridge/Flirting Singles",
+    "license": "MIT"
 }

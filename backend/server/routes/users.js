@@ -95,4 +95,86 @@ router.get('/interactions/flirts/rejected', userController.getRejectedFlirtInter
 router.get('/interactions/messages/:userId', userController.getMessageInteractions);
 router.post('/interactions/messages/send/:userId', userController.sendMessageInteraction);
 
+// Update user profile
+router.put('/profile', [
+    body('displayName').optional().isString().islength({ min: 3, max: 50 }).withMessage('DisplayName must be between 3 and 50 characters'),
+    body('bio').optional().isString().islength({ max: 500 }).withMessage('Bio must be less than 500 characters'),
+    body('age').optional().isInt({ min: 18, max: 100 }).withMessage('You must be 18 years or older'),
+    body('location').optional().isString().withMessage('Location must be a valid string')
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Validation failed',
+                errors: errors.array()
+            });
+        }
+
+        // Remove sensitive information
+        delete userData.email;
+
+        res.json({
+            id: userDoc.id,
+            ...userData
+        });
+    } catch (error) {
+        console.error('Get user error:', error);
+        res.status(500).json({
+            error: 'Failed to fetch user data',
+            message: error.message
+        });
+    }
+});
+
+// Add update timestamp
+updateData.updatedAt = Admin.firestore.FieldValue.server.Timestamp();
+
+await Db.collection('users').doc(userId).update(updateData);
+
+res.json({
+    message: 'Profile updated successfully'
+});
+
+// Search users
+router.get('/search', async (req, res) => {
+    try {
+        const { query, limit = 20 } = req.query;
+
+        if (!query || query.trim().length < 2) {
+            return res.status(500).json({
+                error: 'Search query must be at least 2 characters'
+            });
+        }
+
+        // Simple search by display name
+        const usersSnapshot = await db.collection('users')
+            .where('displayName', '>=', query)
+            .where('displayName', '<=', query + '\uf8ff')
+            .limit(parseInt(limit))
+            .get();
+
+            const users = [];
+            usersSnapshot.forEach(doc => {
+                const userData = doc.data();
+                delete userData.email; // Remove sensitive information
+                users.push({
+                    id: doc.id,
+                    ...userData
+                });
+            });
+
+            res.json({
+                users,
+                total: users.length
+            });
+    } catch (error) {
+        console.error('Search users error:', error);
+        res.status(500).json({
+            error: 'Failed to search users',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router;

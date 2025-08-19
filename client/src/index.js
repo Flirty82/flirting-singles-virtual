@@ -7,6 +7,18 @@ import { Provider } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
+import { createRoom } from 'react-dom/client';
+import './styles/variables.css';
+import './styles/globals.css';
+import '.styles/typography.css';
+import './styles/buttons.css';
+import './styles/cards.csss';
+import './styles/fomrs.css';
+import './styles/alerts.css';
+import './styles/animations.css';
+import './styles/responsive.css';
+import './styles/transitions.css';
+import './styles/icons.css';
 import { Toaster } from 'react-hot-toaster';
 import { ThemeProvider, createTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +26,7 @@ import './index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import reportWebVitals from './reportWebVitals';
+import { createRoot } from 'react-dom/client';
 
 // Import app and store
 import { store } from './store/store';
@@ -21,6 +34,12 @@ import { store } from './store/store';
 // Import styles
 import './index.css';
 import './styles/globals.css';
+import './styles/variables.css';
+import './styles/typography.css';
+import './styles/buttons/css';
+import './styles/cards.css';
+import './styles/forms.css';
+import './styles/alerts.css';
 
 // Import Firebase Config
 import './config/firebase';

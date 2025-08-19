@@ -1,0 +1,118 @@
+:root {
+    --primary-color: #FF69B4;
+    --secondary-color: #FFb6C1;
+    --ligh-pink: #FFF0F5;
+    --dark-pink: #DC143C;
+    --primary-black: #000000;
+    --secondary-black: #1a1a1a;
+    --soft-black: #2d2d2d;
+
+    --primary-white: #FFFFFF;
+    --off-white: #F8F9FA;
+    --cream-white: #FEFEFE;
+
+    --primary-gray: #6C757D;
+    --light-gray: #E9ECEF;
+    --medium-gray: #ADB5BD;
+    --dark-gray: #495057;
+
+    --primary-purple: #8A2BE2;
+    --secondary-purple: #DDA0DD;
+    --light-purple: #E6E6FA;
+    --dark-purple: #4B0082;
+
+    /*Semantic Colors*/
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --info: #17a2b8;
+
+    /*Gradients*/
+    --gradient-primary: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-purple) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-pink) 0%, var(--secondary-purple) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--secondary-black) 0%, var(--soft-black) 100%);
+
+    /*Spacing*/
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+
+    /*Font Sizes*/
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+
+    --font-size-base: 1rem; /* Base font size */
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2rem;
+    --font-size-xxxl: 3rem;
+
+    /*Font Weights*/
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+
+    /*Typography*/
+    --font-family-sans-serif: 'Helvetica Neue', Arial, sans-serif;
+    --font-family-serif: 'Georgia', serif;
+    --font-family-monospace: 'Courier New', Courier, monospace;
+    --font-family-display: 'Poppins', sans-serif;
+    --font-family-heading: 'Montserrat', sans-serif;
+    --font-family-body: 'Open Sans', sans-serif;
+
+    /*Borders*/
+    --border-radius-sm: 0.2rem;
+    --border-radius-md: 0.25rem;
+    --border-radius-lg: 0.3rem;
+    --border-radius-xl: 0.5rem;
+    --border-radius-xxl: 0.75rem;
+    --border-radius-pill: 50rem; /* For pill-shaped elements */
+
+    /*Border Radius*/
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 50%;
+
+    /*Shadows*/
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+    /*Transitions*/
+    transition-delay: 0.15s ease-in-out;
+    transition-behavior: 0.3s ease-in-out;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+    transition-property: all;
+    transition: all 0.3s ease-in-out;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    /*Z-Index*/
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Media Queries */
+@media (max-width: 576px) {
+    :root {
+        --font-size-base: 0.875rem; /* Adjust base font size for smaller screens */
+        --spacing-md: 0.75rem; /* Adjust spacing for smaller screens */
+    }
+}
+
+
+
+

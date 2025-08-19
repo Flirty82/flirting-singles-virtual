@@ -9,6 +9,8 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const admin = require('firebase-admin');
 const path = require('path');
+const session = require('express-session');
+const { createServer } = require('http');
 require('dotenv').config();
 
 // Import middleware
@@ -33,6 +35,11 @@ var serviceAccount = require('path|to|serviceAccountKey.json');
 admin.initializeCertif({
     credential: admin.credential(serviceAccount),
     databaseURL: 'https://flirting-singles-virtual-default-rtdb.firebaseio.com'
+});
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET
 });
 
 // Security middleware

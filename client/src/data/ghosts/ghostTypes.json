@@ -1,0 +1,136 @@
+{
+  "ghostTypes": {
+    "SPIRIT": {
+      "name": "Spirit",
+      "description": "A common ghost that can be found almost anywhere. Spirits are generally harmless but can become aggressive when provoked.",
+      "strength": 30,
+      "aggression": 20,
+      "speed": 1.7,
+      "evidence": ["EMF_LEVEL_5", "SPIRIT_BOX", "GHOST_WRITING"],
+      "behaviors": {
+        "hunt_threshold": 50,
+        "hunt_duration": 25,
+        "interaction_rate": 0.3,
+        "response_to_incense": "high",
+        "light_interaction": "moderate"
+      },
+      "weaknesses": ["Smudge Sticks"],
+      "abilities": ["Spirit Box Communication", "Basic Interactions"],
+      "hunt_behavior": "normal",
+      "manifestation_sounds": ["whispers", "footsteps", "door_creaks"],
+      "preferred_rooms": ["living_room", "bedroom", "kitchen"],
+      "backstory": "Spirits are the most common type of ghost. They are very common ghosts and can manifest anywhere."
+    },
+    
+    "WRAITH": {
+      "name": "Wraith",
+      "description": "A Wraith is one of the most dangerous ghosts you will find. It is also the only known ghost that has the ability to fly and has sometimes been known to travel through walls.",
+      "strength": 50,
+      "aggression": 40,
+      "speed": 2.3,
+      "evidence": ["EMF_LEVEL_5", "SPIRIT_BOX", "DOTS_PROJECTOR"],
+      "behaviors": {
+        "hunt_threshold": 60,
+        "hunt_duration": 35,
+        "interaction_rate": 0.4,
+        "teleportation": true,
+        "wall_phasing": true,
+        "salt_immunity": true
+      },
+      "weaknesses": ["None"],
+      "abilities": ["Teleportation", "Wall Phasing", "Flight"],
+      "hunt_behavior": "teleporting",
+      "manifestation_sounds": ["chains", "wailing", "electronic_interference"],
+      "preferred_rooms": ["attic", "basement", "isolated_areas"],
+      "backstory": "Wraiths are territorial spirits that can phase through walls and teleport to players."
+    },
+
+    "PHANTOM": {
+      "name": "Phantom",
+      "description": "A Phantom is a ghost that can possess the living, inducing fear into those around it. They are most commonly summoned from Ouija Boards.",
+      "strength": 45,
+      "aggression": 35,
+      "speed": 1.7,
+      "evidence": ["SPIRIT_BOX", "FINGERPRINTS", "DOTS_PROJECTOR"],
+      "behaviors": {
+        "hunt_threshold": 50,
+        "hunt_duration": 30,
+        "interaction_rate": 0.5,
+        "photo_sensitivity": true,
+        "possession_ability": true,
+        "fear_induction": "high"
+      },
+      "weaknesses": ["Photography"],
+      "abilities": ["Possession", "Fear Induction", "Invisibility"],
+      "hunt_behavior": "stalking",
+      "manifestation_sounds": ["breathing", "heartbeat", "whispers"],
+      "preferred_rooms": ["bedroom", "bathroom", "closets"],
+      "backstory": "Phantoms feed on fear and become more aggressive the more afraid you become."
+    },
+
+    "POLTERGEIST": {
+      "name": "Poltergeist",
+      "description": "One of the most famous ghosts, a Poltergeist, also known as a noisy ghost can manipulate objects around it to spread fear into its victims.",
+      "strength": 60,
+      "aggression": 70,
+      "speed": 1.7,
+      "evidence": ["SPIRIT_BOX", "FINGERPRINTS", "GHOST_WRITING"],
+      "behaviors": {
+        "hunt_threshold": 50,
+        "hunt_duration": 30,
+        "interaction_rate": 0.8,
+        "object_throwing": "very_high",
+        "electrical_interference": "high",
+        "group_sensitivity": true
+      },
+      "weaknesses": ["Empty Rooms"],
+      "abilities": ["Object Manipulation", "Electrical Interference", "Multi-Object Throws"],
+      "hunt_behavior": "aggressive",
+      "manifestation_sounds": ["objects_falling", "electrical_buzzing", "slamming"],
+      "preferred_rooms": ["kitchen", "living_room", "any_room_with_items"],
+      "backstory": "Poltergeists are violent spirits that can throw multiple objects at once and cause electrical interference."
+    },
+
+    "BANSHEE": {
+      "name": "Banshee",
+      "description": "A Banshee is a natural hunter and will attack anything. They have been known to stalk their prey one at a time until making their kill.",
+      "strength": 40,
+      "aggression": 80,
+      "speed": 2.5,
+      "evidence": ["FINGERPRINTS", "GHOST_ORBS", "DOTS_PROJECTOR"],
+      "behaviors": {
+        "hunt_threshold": 50,
+        "hunt_duration": 35,
+        "interaction_rate": 0.3,
+        "target_focus": true,
+        "microphone_detection": true,
+        "crucifix_weakness": "strong"
+      },
+      "weaknesses": ["Crucifixes"],
+      "abilities": ["Target Stalking", "Enhanced Hearing", "Scream Attack"],
+      "hunt_behavior": "focused_hunting",
+      "manifestation_sounds": ["screaming", "wailing", "singing"],
+      "preferred_rooms": ["anywhere_target_is"],
+      "backstory": "Banshees will target one person at a time and stalk them relentlessly."
+    },
+
+    "JINN": {
+      "name": "Jinn",
+      "description": "A Jinn is a territorial ghost that will attack when threatened. They have also been known to be able to travel at significant speed.",
+      "strength": 55,
+      "aggression": 30,
+      "speed": 2.5,
+      "evidence": ["EMF_LEVEL_5", "FINGERPRINTS", "FREEZING_TEMPERATURES"],
+      "behaviors": {
+        "hunt_threshold": 50,
+        "hunt_duration": 30,
+        "interaction_rate": 0.4,
+        "electrical_dependency": true,
+        "speed_boost_on_power": true,
+        "territorial": true
+      },
+      "weaknesses": ["Turning off breaker"],
+      "abilities": ["Electrical Manipulation", "Speed Boost", "Territorial Control"],
+      "hunt_behavior": "fast_when_powered",
+      "manifestation_sounds": ["electrical_humming", "power_surges", "wind"],
+      "preferred_
