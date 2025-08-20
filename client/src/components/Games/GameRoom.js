@@ -1,3 +1,4 @@
+// client/src/components/games/GameRoom.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Instructions from '../common/Instructions';
@@ -6,7 +7,7 @@ import '../../styles/components/GameRoom.css';
 const GameRoom = ({ user, socket }) => {
   const { roomId } = useParams();
   const navigate = useNavigate();
- 
+  
   const [roomData, setRoomData] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [gameStatus, setGameStatus] = useState('waiting'); // waiting, starting, active, finished
@@ -127,7 +128,7 @@ const GameRoom = ({ user, socket }) => {
     let clicks = 0;
     const startTime = Date.now();
     const duration = 10000; // 10 seconds
-   
+    
     const clickHandler = () => {
       clicks++;
       const elapsed = Date.now() - startTime;
@@ -137,7 +138,7 @@ const GameRoom = ({ user, socket }) => {
         document.removeEventListener('click', clickHandler);
       }
     };
-   
+    
     document.addEventListener('click', clickHandler);
     setTimeout(() => {
       document.removeEventListener('click', clickHandler);
@@ -174,7 +175,7 @@ const GameRoom = ({ user, socket }) => {
   }
 
   const selectedGameInfo = availableGames.find(g => g.id === selectedGame);
-  const canStartGame = selectedGame &&
+  const canStartGame = selectedGame && 
     participants.length >= (selectedGameInfo?.minPlayers || 1) &&
     participants.length <= (selectedGameInfo?.maxPlayers || 50);
 
@@ -188,15 +189,15 @@ const GameRoom = ({ user, socket }) => {
               👥 {participants.length} participants
             </span>
             <span className="room-status">
-              Status: {gameStatus === 'waiting' ? '⏳ Waiting' :
-                      gameStatus === 'starting' ? '🚀 Starting' :
+              Status: {gameStatus === 'waiting' ? '⏳ Waiting' : 
+                      gameStatus === 'starting' ? '🚀 Starting' : 
                       gameStatus === 'active' ? '🔴 Active' : '✅ Finished'}
             </span>
           </div>
         </div>
-       
+        
         <div className="room-controls">
-          <button
+          <button 
             onClick={() => setShowInstructions(true)}
             className="instructions-btn"
           >
@@ -223,12 +224,12 @@ const GameRoom = ({ user, socket }) => {
           <h3>👥 Participants ({participants.length})</h3>
           <div className="participants-grid">
             {participants.map(participant => (
-              <div
-                key={participant.userId}
+              <div 
+                key={participant.userId} 
                 className={`participant-card ${participant.userId === user.uid ? 'current-user' : ''}`}
               >
-                <img
-                  src={participant.userAvatar || '/default-avatar.png'}
+                <img 
+                  src={participant.userAvatar || '/default-avatar.png'} 
                   alt={participant.userName}
                   className="participant-avatar"
                 />
@@ -241,9 +242,9 @@ const GameRoom = ({ user, socket }) => {
                     {participant.status || 'Ready'}
                   </div>
                 </div>
-               
+                
                 {isHost && participant.userId !== user.uid && (
-                  <button
+                  <button 
                     onClick={() => kickPlayer(participant.userId)}
                     className="kick-btn"
                   >
@@ -261,7 +262,7 @@ const GameRoom = ({ user, socket }) => {
               <h3>🎯 Select Game (Host Controls)</h3>
               <div className="game-options">
                 {availableGames.map(game => (
-                  <div
+                  <div 
                     key={game.id}
                     className={`game-option ${selectedGame === game.id ? 'selected' : ''}`}
                     onClick={() => setSelectedGame(game.id)}
@@ -273,15 +274,15 @@ const GameRoom = ({ user, socket }) => {
                   </div>
                 ))}
               </div>
-             
-              <button
+              
+              <button 
                 onClick={startGame}
                 className={`start-game-btn ${canStartGame ? 'enabled' : 'disabled'}`}
                 disabled={!canStartGame}
               >
                 🚀 Start Game
               </button>
-             
+              
               {selectedGameInfo && (
                 <div className="game-requirements">
                   {participants.length < selectedGameInfo.minPlayers && (
@@ -315,7 +316,7 @@ const GameRoom = ({ user, socket }) => {
               <div key={game.id} className="mini-game-card">
                 <div className="mini-game-icon">{game.icon}</div>
                 <div className="mini-game-name">{game.name}</div>
-                <button
+                <button 
                   onClick={() => startMiniGame(game.id)}
                   className="play-mini-btn"
                   disabled={currentMiniGame === game.id}
@@ -325,7 +326,7 @@ const GameRoom = ({ user, socket }) => {
               </div>
             ))}
           </div>
-         
+          
           {currentMiniGame === 'clickSpeed' && (
             <div className="mini-game-active">
               <h4>⚡ Click Speed Test</h4>
@@ -335,6 +336,23 @@ const GameRoom = ({ user, socket }) => {
               </button>
             </div>
           )}
-         
+          
           {miniGameScore > 0 && (
-            <div className="mini-game-score"> 
+            <div className="mini-game-score">
+              <h4>🏆 Your Score: {miniGameScore}</h4>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showInstructions && (
+        <Instructions 
+          instructions={gameRoomInstructions}
+          onClose={() => setShowInstructions(false)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default GameRoom;

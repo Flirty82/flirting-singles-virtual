@@ -13,9 +13,12 @@ const session = require('express-session');
 const { createServer } = require('http');
 require('dotenv').config();
 
+// Load environment variables
+dotenv.config();
+
 // Import middleware
 const errorHandler = require('./middlware/errorHandler');
-const { authenticate } = requrie('./middleware/auth');
+const { apiLimiter, authLimiter, messageLimiter, postLimiter } = require('./middleware/rateLimit');
 
 // Import routes
 const authRoutes = require('./routes/auth');
