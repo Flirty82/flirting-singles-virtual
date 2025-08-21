@@ -7,7 +7,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "text": "react-scripts test",
+    "test": "react-scripts test",
     "deploy": "npm run build && firebase deploy -- only hosting && firebase deploy",
     "eject": "react-scripts eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'",

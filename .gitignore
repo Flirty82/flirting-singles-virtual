@@ -67,3 +67,56 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# next.js build output
+.next
+out 
+# Nuxt.js build / generate output
+.nuxt
+dist
+# Gatsby files
+.cache/
+public
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+# FuseBox cache
+.fusebox/
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+# VS Code files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+# Temporary folders
+tmp
+temp
+# Mac system files
+.DS_Store
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Linux system files
+*~
+# JetBrains IDE files
+.idea/
+# SvelteKit build output
+.build/
+# End of https://www.toptal.com/developers/gitignore/api:node,macos,linux,windows,visualstudiocode
+
+# Firebase service account keys
+*.json
+# End of https://www.toptal.com/developers/gitignore/api:node,macos,linux,windows,visualstudiocode
+
+# --- IGNORE ---
+# End of https://www.toptal.com/developers/gitignore/api:node,macos,linux,windows,visualstudiocode
