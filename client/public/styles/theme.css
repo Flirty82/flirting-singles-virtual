@@ -1,0 +1,11 @@
+/*Import Google Fonts*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700%display=swap');
+
+/*CSS Variables for consistent theming*/
+:root {
+    /*Primary Colors*/
+    --primary-pink: #FF69B4;
+    --primary-purple: #8B5CF6;
+    --primary-black: #1F2937;
+    --primary-white: #FFFFFF;
+}

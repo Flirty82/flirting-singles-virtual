@@ -42,15 +42,30 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'prefer-not-to-say']
     },
     // Membership Information
-    membershipType: {
-        type: String,
-        enum: ['free', 'gold', 'platinum', 'diamond'],
-        default: 'free'
-    },
-    membershipExpiry: {
-        type: Date,
-        default: null
-    },
+   membership: {
+    type: String,
+    enum: ['free', 'gold', 'platinum', 'diamond'],
+    default: 'free'
+  },
+  membershipExpiry: {
+    type: Date,
+    default: null
+  },
+  autoRenew: {
+    type: Boolean,
+    default: true
+  },
+  paymentHistory: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment'
+  }],
+  subscriptionId: {
+    type: String,
+    default: null
+  }
+}, {
+  timestamps: true
+},
     // Profile setup
     profileCompleted: {
         type: Boolean,
@@ -74,11 +89,12 @@ const userSchema = new mongoose.Schema({
     verificationToken: String,
     passwordResetToken: String,
     passwordResetExpirty: Date,
-
+    // Social Media Links
+    
     // Profile Images
     profilePicture: {
         type: String,
-        default: null
+        default: null,
     },
     profileImages: {
         url: String,
@@ -88,7 +104,7 @@ const userSchema = new mongoose.Schema({
     location: {
         city: String,
         state: String,
-        country: String,
+        country: String
     },
     privacy: {
         showAge: { type: Boolean, default: true },
@@ -121,9 +137,7 @@ const userSchema = new mongoose.Schema({
         likesReceived: { type: Number, default: 0 },
         messagesReceived: { type: Number, default: 0 },
         flirtsReceived: { type: Number, default: 0 }
-    }
-
-});
+    });
 
 // Virtual for age calculation
 userSchema.virtual('age').get(function() {

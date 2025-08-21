@@ -1,0 +1,531 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Phone, Video, MoreVertical, Smile, Paperclip, Search, Circle, Crown, Diamond, Music, Heart, MessageCircle } from 'lucide-react';
+
+const MessagingApp = () => {
+  const [currentUser, setCurrentUser] = useState({
+    id: '1',
+    name: 'John Doe',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+    membership: 'platinum',
+    isOnline: true
+  });
+
+  const [conversations, setConversations] = useState([
+    {
+      id: '1',
+      participant: {
+        id: '2',
+        name: 'Sarah Johnson',
+        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
+        membership: 'diamond',
+        isOnline: true,
+        lastSeen: null
+      },
+      lastMessage: {
+        content: "I'd love to go on that virtual date! 😊",
+        timestamp: new Date(Date.now() - 300000),
+        senderId: '2'
+      },
+      unreadCount: 2
+    },
+    {
+      id: '2',
+      participant: {
+        id: '3',
+        name: 'Emma Davis',
+        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+        membership: 'gold',
+        isOnline: false,
+        lastSeen: new Date(Date.now() - 1800000)
+      },
+      lastMessage: {
+        content: 'Thanks for the music recommendation!',
+        timestamp: new Date(Date.now() - 1800000),
+        senderId: '3'
+      },
+      unreadCount: 0
+    },
+    {
+      id: '3',
+      participant: {
+        id: '4',
+        name: 'Mike Wilson',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+        membership: 'free',
+        isOnline: true,
+        lastSeen: null
+      },
+      lastMessage: {
+        content: 'Hey there! How are you doing?',
+        timestamp: new Date(Date.now() - 3600000),
+        senderId: '4'
+      },
+      unreadCount: 1
+    }
+  ]);
+
+  const [selectedConversation, setSelectedConversation] = useState(conversations[0]);
+  const [messages, setMessages] = useState([
+    {
+      id: '1',
+      senderId: '2',
+      content: 'Hey! I saw your post about virtual dating. Sounds interesting!',
+      timestamp: new Date(Date.now() - 3600000),
+      type: 'text',
+      status: 'read'
+    },
+    {
+      id: '2',
+      senderId: '1',
+      content: 'Yes! It\'s such a cool feature. Have you tried it yet?',
+      timestamp: new Date(Date.now() - 3500000),
+      type: 'text',
+      status: 'read'
+    },
+    {
+      id: '3',
+      senderId: '2',
+      content: 'Not yet, but I\'d love to try it with someone special 😉',
+      timestamp: new Date(Date.now() - 3400000),
+      type: 'text',
+      status: 'read'
+    },
+    {
+      id: '4',
+      senderId: '1',
+      content: 'Well, you\'re talking to the right person! When are you free?',
+      timestamp: new Date(Date.now() - 3300000),
+      type: 'text',
+      status: 'read'
+    },
+    {
+      id: '5',
+      senderId: '2',
+      content: "I'd love to go on that virtual date! 😊",
+      timestamp: new Date(Date.now() - 300000),
+      type: 'text',
+      status: 'delivered'
+    }
+  ]);
+
+  const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
+  
+  const messagesEndRef = useRef(null);
+  const messageInputRef = useRef(null);
+
+  // Simulate Socket.io connection
+  useEffect(() => {
+    setTimeout(() => {
+      setIsConnected(true);
+      setConnectionStatus('connected');
+    }, 1000);
+
+    const messageInterval = setInterval(() => {
+      if (Math.random() > 0.8) {
+        simulateIncomingMessage();
+      }
+    }, 10000);
+
+    const typingInterval = setInterval(() => {
+      if (Math.random() > 0.9) {
+        simulateTyping();
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(typingInterval);
+    };
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const simulateIncomingMessage = () => {
+    if (selectedConversation && Math.random() > 0.5) {
+      const newMsg = {
+        id: Date.now().toString(),
+        senderId: selectedConversation.participant.id,
+        content: getRandomMessage(),
+        timestamp: new Date(),
+        type: 'text',
+        status: 'delivered'
+      };
+      setMessages(prev => [...prev, newMsg]);
+      
+      setConversations(prev => prev.map(conv => 
+        conv.id === selectedConversation.id 
+          ? { ...conv, lastMessage: { content: newMsg.content, timestamp: newMsg.timestamp, senderId: newMsg.senderId }, unreadCount: conv.unreadCount + 1 }
+          : conv
+      ));
+    }
+  };
+
+  const simulateTyping = () => {
+    if (selectedConversation) {
+      setTypingUsers([selectedConversation.participant.name]);
+      setTimeout(() => setTypingUsers([]), 3000);
+    }
+  };
+
+  const getRandomMessage = () => {
+    const messages = [
+      "That sounds great! 😊",
+      "I'm really enjoying our conversation",
+      "What are your plans for the weekend?",
+      "I love that song too! 🎵",
+      "You have great taste in music",
+      "Would you like to video chat sometime?",
+      "I'm excited to get to know you better",
+      "Thanks for the sweet message! 💕"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  const getMembershipIcon = (membership) => {
+    switch(membership) {
+      case 'gold': return <Crown className="w-3 h-3 text-yellow-400" />;
+      case 'platinum': return <Crown className="w-3 h-3 text-gray-300" />;
+      case 'diamond': return <Diamond className="w-3 h-3 text-blue-400" />;
+      default: return null;
+    }
+  };
+
+  const getMembershipBorderClass = (membership) => {
+    switch(membership) {
+      case 'gold': return 'border-yellow-400 shadow-yellow-400/30';
+      case 'platinum': return 'border-gray-300 shadow-gray-300/30';
+      case 'diamond': return 'border-blue-400 shadow-blue-400/30';
+      default: return 'border-gray-300';
+    }
+  };
+
+  const canSendMessage = () => {
+    return currentUser.membership !== 'free' || true;
+  };
+
+  const canMakeCall = () => {
+    return ['gold', 'platinum', 'diamond'].includes(currentUser.membership);
+  };
+
+  const canVideoCall = () => {
+    return ['platinum', 'diamond'].includes(currentUser.membership);
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !canSendMessage()) return;
+
+    const message = {
+      id: Date.now().toString(),
+      senderId: currentUser.id,
+      content: newMessage.trim(),
+      timestamp: new Date(),
+      type: 'text',
+      status: 'sending'
+    };
+
+    setMessages(prev => [...prev, message]);
+    setNewMessage('');
+
+    setTimeout(() => {
+      setMessages(prev => prev.map(msg => 
+        msg.id === message.id ? { ...msg, status: 'sent' } : msg
+      ));
+    }, 1000);
+
+    setTimeout(() => {
+      setMessages(prev => prev.map(msg => 
+        msg.id === message.id ? { ...msg, status: 'delivered' } : msg
+      ));
+    }, 2000);
+
+    setConversations(prev => prev.map(conv => 
+      conv.id === selectedConversation.id 
+        ? { ...conv, lastMessage: { content: message.content, timestamp: message.timestamp, senderId: message.senderId } }
+        : conv
+    ));
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const formatTime = (timestamp) => {
+    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatLastSeen = (lastSeen) => {
+    if (!lastSeen) return 'Online';
+    const now = new Date();
+    const diff = now - lastSeen;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  const getMessageStatus = (status) => {
+    switch(status) {
+      case 'sending': return <Circle className="w-3 h-3 text-gray-400 animate-pulse fill-current" />;
+      case 'sent': return <Circle className="w-3 h-3 text-gray-400 fill-current" />;
+      case 'delivered': return <div className="flex space-x-1"><Circle className="w-3 h-3 text-pink-400 fill-current" /><Circle className="w-3 h-3 text-pink-400 fill-current" /></div>;
+      case 'read': return <div className="flex space-x-1"><Circle className="w-3 h-3 text-purple-500 fill-current" /><Circle className="w-3 h-3 text-purple-500 fill-current" /></div>;
+      default: return null;
+    }
+  };
+
+  const filteredConversations = conversations.filter(conv =>
+    conv.participant.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-pink-500 via-purple-600 to-gray-900">
+      {/* Sidebar - Conversations List */}
+      <div className="w-1/3 bg-white/95 backdrop-blur-lg border-r border-pink-200 flex flex-col shadow-2xl">
+        {/* Header */}
+        <div className="p-6 border-b border-pink-200 bg-gradient-to-r from-pink-500 to-purple-600">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white drop-shadow-lg">Messages</h2>
+            <div className={`flex items-center space-x-2 text-sm ${isConnected ? 'text-white' : 'text-pink-200'}`}>
+              <Circle className={`w-2 h-2 ${isConnected ? 'fill-current text-green-400' : 'fill-current text-red-400'} drop-shadow-lg`} />
+              <span className="capitalize font-medium">{connectionStatus}</span>
+            </div>
+          </div>
+          
+          {/* Search */}
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-white/70" />
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border-2 border-white/30 rounded-xl bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-white/50 backdrop-blur-sm"
+            />
+          </div>
+        </div>
+
+        {/* Conversations */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredConversations.map((conversation) => (
+            <div
+              key={conversation.id}
+              onClick={() => setSelectedConversation(conversation)}
+              className={`p-4 border-b border-pink-100 cursor-pointer transition-all duration-300 hover:bg-pink-50 hover:transform hover:translate-x-2 ${
+                selectedConversation?.id === conversation.id ? 'bg-gradient-to-r from-pink-100 to-purple-100 border-l-4 border-l-pink-500 shadow-lg' : ''
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <img
+                    src={conversation.participant.avatar}
+                    alt={conversation.participant.name}
+                    className={`w-14 h-14 rounded-full border-3 ${getMembershipBorderClass(conversation.participant.membership)} shadow-lg hover:scale-105 transition-transform duration-300`}
+                  />
+                  <div className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white shadow-lg ${
+                    conversation.participant.isOnline ? 'bg-green-500' : 'bg-gray-400'
+                  }`} />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-semibold text-gray-800 truncate">{conversation.participant.name}</h3>
+                      {getMembershipIcon(conversation.participant.membership)}
+                    </div>
+                    {conversation.unreadCount > 0 && (
+                      <span className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center font-bold shadow-md">
+                        {conversation.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-sm text-gray-600 truncate max-w-[200px]">{conversation.lastMessage.content}</p>
+                    <span className="text-xs text-gray-500 font-medium">
+                      {formatTime(conversation.lastMessage.timestamp)}
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-purple-600 font-medium mt-1">
+                    {conversation.participant.isOnline ? '🟢 Online' : `⚫ ${formatLastSeen(conversation.participant.lastSeen)}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col bg-white/90 backdrop-blur-lg">
+        {selectedConversation ? (
+          <>
+            {/* Chat Header */}
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 border-b border-pink-200 p-4 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <img
+                      src={selectedConversation.participant.avatar}
+                      alt={selectedConversation.participant.name}
+                      className={`w-12 h-12 rounded-full border-3 ${getMembershipBorderClass(selectedConversation.participant.membership)} shadow-lg`}
+                    />
+                    <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                      selectedConversation.participant.isOnline ? 'bg-green-500' : 'bg-gray-400'
+                    }`} />
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-bold text-white drop-shadow-lg">{selectedConversation.participant.name}</h3>
+                      {getMembershipIcon(selectedConversation.participant.membership)}
+                    </div>
+                    <p className="text-sm text-pink-100">
+                      {selectedConversation.participant.isOnline ? '🟢 Online' : `⚫ ${formatLastSeen(selectedConversation.participant.lastSeen)}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  {canMakeCall() && (
+                    <button className="p-3 text-white hover:text-pink-200 hover:bg-white/20 rounded-xl transition-all duration-300 backdrop-blur-sm">
+                      <Phone className="w-5 h-5" />
+                    </button>
+                  )}
+                  
+                  {canVideoCall() && (
+                    <button className="p-3 text-white hover:text-pink-200 hover:bg-white/20 rounded-xl transition-all duration-300 backdrop-blur-sm">
+                      <Video className="w-5 h-5" />
+                    </button>
+                  )}
+                  
+                  <button className="p-3 text-white hover:text-pink-200 hover:bg-white/20 rounded-xl transition-all duration-300 backdrop-blur-sm">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-pink-50/50 to-purple-50/50">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-xs lg:max-w-md ${message.senderId === currentUser.id ? 'order-last' : ''}`}>
+                    <div
+                      className={`px-4 py-3 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl ${
+                        message.senderId === currentUser.id
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-br-md'
+                          : 'bg-white text-gray-800 rounded-bl-md border border-pink-200'
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                    </div>
+                    
+                    <div className={`flex items-center mt-2 space-x-2 ${
+                      message.senderId === currentUser.id ? 'justify-end' : 'justify-start'
+                    }`}>
+                      <span className="text-xs text-gray-500 font-medium">{formatTime(message.timestamp)}</span>
+                      {message.senderId === currentUser.id && getMessageStatus(message.status)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Typing Indicator */}
+              {typingUsers.length > 0 && (
+                <div className="flex justify-start">
+                  <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-lg border border-pink-200">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <div className="bg-white border-t border-pink-200 p-4 shadow-lg">
+              {!canSendMessage() && (
+                <div className="bg-gradient-to-r from-pink-100 to-purple-100 border border-pink-300 text-pink-700 px-4 py-3 rounded-xl mb-4 shadow-md">
+                  <p className="text-sm font-medium">💎 Upgrade your membership to send messages!</p>
+                </div>
+              )}
+              
+              <div className="flex items-center space-x-3">
+                <button className="p-3 text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-all duration-300">
+                  <Paperclip className="w-5 h-5" />
+                </button>
+                
+                <div className="flex-1 relative">
+                  <input
+                    ref={messageInputRef}
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={canSendMessage() ? "Type a message..." : "Upgrade to send messages"}
+                    disabled={!canSendMessage()}
+                    className="w-full px-6 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all duration-300 shadow-sm"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="p-3 text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-all duration-300"
+                >
+                  <Smile className="w-5 h-5" />
+                </button>
+                
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!newMessage.trim() || !canSendMessage()}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-3 rounded-xl hover:from-pink-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
+            <div className="text-center p-8">
+              <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-full p-6 w-24 h-24 mx-auto mb-6 shadow-2xl">
+                <MessageCircle className="w-12 h-12 text-white mx-auto" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Select a conversation</h3>
+              <p className="text-gray-600 max-w-sm mx-auto leading-relaxed">Choose a conversation from the sidebar to start messaging and connect with someone special! 💕</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MessagingApp;
