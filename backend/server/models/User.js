@@ -1,218 +1,58 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
         unique: true,
-        lowercase: true,
-    },
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        minlength: [8, 'Username must be at least 8 characters.'],
-        maxlength: [30, 'Username can not exceed 30 characters']
+        lowercase: true
     },
     password: {
         type: String,
         required: true,
-        unique: true,
-        minlength: [8, 'Password must be at least 8 characters'],
-        select: false // Fon't include password in queries by default
+        minlength: 8,
+        unique: true
     },
-    // Basic Profile Information
     firstName: {
         type: String,
         required: true,
+        trim: true
     },
     lastName: {
-        type: String,
-        required: true
+        type: true,
+        required: true,
+        trim: true
     },
     dateOfBirth: {
-        type: Date,
-        required: [true, 'Date of birth is required'],
-    },
-    gender: {
-        type: String,
+        type: date,
         required: true,
-        enum: ['male', 'female', 'prefer-not-to-say']
     },
-    // Membership Information
-   membership: {
-    type: String,
-    enum: ['free', 'gold', 'platinum', 'diamond'],
-    default: 'free'
-  },
-  membershipExpiry: {
-    type: Date,
-    default: null
-  },
-  autoRenew: {
-    type: Boolean,
-    default: true
-  },
-  paymentHistory: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Payment'
-  }],
-  subscriptionId: {
-    type: String,
-    default: null
-  }
-}, {
-  timestamps: true
-},
-    // Profile setup
-    profileCompleted: {
-        type: Boolean,
-        default: false
-    },
-    profileSetUp: {
-        type: Number,
-        default: 1,
-        min: 1,
-        max: 5
-    },
-    // Account Status
     isActive: {
         type: Boolean,
         default: true
     },
-    isVerified: {
+    isEmailVerificed: {
         type: Boolean,
         default: false
     },
-    verificationToken: String,
-    passwordResetToken: String,
-    passwordResetExpirty: Date,
-    // Social Media Links
-    
-    // Profile Images
-    profilePicture: {
-        type: String,
-        default: null,
+    isPhoneVerified: {
+        type: Boolean,
+        default: false
     },
-    profileImages: {
-        url: String,
-        publicId: String,
-        isMain: { type: Boolean, default: false }
-    },
-    location: {
-        city: String,
-        state: String,
-        country: String
-    },
-    privacy: {
-        showAge: { type: Boolean, default: true },
-        showLocation: { type: Boolean, default: true },
-        showOnlineStatus: { type: Boolean, default: true },
-        allowMessages: { type: String, enum: ['everyone', 'matches', 'only-me'], defualt: 'everyone' }
-    },
-    lastActive: {
+    lastSeen: {
         type: Date,
         default: Date.now
-    },
-    isOnline: {
-        type: Boolean,
-        default: false
-    },
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        default: 'User'
-    }],
-    following: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    blockedUsers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    stats: {
-        profileViews: { type: Number, default: 0 },
-        likesReceived: { type: Number, default: 0 },
-        messagesReceived: { type: Number, default: 0 },
-        flirtsReceived: { type: Number, default: 0 }
-    });
-
-// Virtual for age calculation
-userSchema.virtual('age').get(function() {
-    if (!this.dateOfBirth) return null;
-    const today = new Date();
-    const birthDate = new Date(this.dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
     }
-    return age;
+}, {
+    timestamps: true
 });
 
-userSchema.virtual('fullName').get(function () {
-    return '${this.firstName} ${this.lastName}';
-});
-
-userSchema.virtual('isPremium').get(function() {
-    return ['gold', 'platinum', 'diamond'].includes(this.membershipType);
-});
-
+// Hash password before saving
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
-
-    try {
-    const salt = await bcrypt.getSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-    } catch (error) {
-        next(error);
-    }
-});
-
-userSchema.pre('save', function(next) {
-    if (this.isNew || this.isModified('isOnline')) {
-        this.lastActive = new Date();
-    }
+    this.password = await bcrypt.hash(this.password, 12);
     next();
 });
-
-userSchem.methods.matchPassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-};
-
-userSchema.methods.getSignedJwtToken = function() {
-    return jwt.sign(
-    { id: this._id, username: this.username, membershipType: this.membershipType },
-process.env.JWT_SECRET,
-{expiresIn: process.env.JWT_EXPIRE}
-    );
-};
-
-userSchema.methods.getResetPasswordToken = function() {
-    const resetToken = require('crypto').randomBytes(20).toString('hex');
-
-    this.passwordResetToken = require(crypto)
-       .createHash('sha256')
-       .update(resetToken)
-       .digest('hex');
-
-       this.passwordRestExpires = Date.now() + 10 * 60 * 1000;  // 10 minutes
-
-       return resetToken;
-};
-
-userSchema.statics.getByMembershipType = function(membershipType) {
-    return this.find({ membershipType, isActive: true });
-};
-
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-userSchema.index({ membershipType: 1 });
-userSchema.index({ 'location.coordinates': '2dshpere' });
-userSchema.index({ isActive: 1, isVerified: 1 });
-userSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('User', userSchema);

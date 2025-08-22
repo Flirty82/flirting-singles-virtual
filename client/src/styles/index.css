@@ -1,0 +1,35 @@
+/* Import all CSS files */
+@import './globals/variables.css';
+@import './globals/reset.css';
+@import './globals/base.css';
+@import './components/UserProfile.css';
+@import './components/ActivityFeed.css';
+@import './components/Navigation.css';
+@import './components/Cards.css';
+
+/* Global App Styles */
+body {
+  font-family: var(--font-primary);
+  background: linear-gradient(135deg, var(--neutral-gray-100), var(--neutral-gray-200));
+  min-height: 100vh;
+  color: var(--neutral-gray-900);
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-xl);
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
