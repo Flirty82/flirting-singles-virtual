@@ -44,6 +44,18 @@ import './styles/alerts.css';
 // Import Firebase Config
 import './config/firebase';
 
+export { default as HomePage } from 'flirting-singles-virtual/client/src/pages/HomePage';
+export { default as LoginPage } from 'flirting-singles-virtual/client/src/pages/LoginPage';
+export { default as SignupPage } from 'flirting-singles-virtual/client/src/pages/SignupPage';
+export { default as ContactPage } from 'flirting-singles-virtual/client/src/pages/ContactPage';
+export { default as MembershipPage } from 'flirting-singles-virtual/client/src/pages/MembershipPage';
+export { default as ActivityFeedPage } from 'flirting-singles-virtual/client/src/pages/ActivityFeedPage';
+export { default as ChatPage } from 'flirting-singles-virtual/client/src/pages/ChatPage';
+export { default as ProfilePage } from 'flirting-singles-virtual/client/src/pages/ProfilePage';
+export { default as BingoPage } from 'flirting-singles-virtual/client/src/components/games/BingoPage';
+export { default as KaraokePage } from 'flirting-singles-virtual/client/src/components/games/KaraokePage';
+export { default as ParanormalActivityPage } from 'flirting-singles-virtual/client/src/components/games/ParanormalActivityPage';
+
 // Initialize React Query client
 const queryClient = new QueryClient({
   defaultOptions: {

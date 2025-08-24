@@ -4,6 +4,7 @@
   "description": "Client for the Flirting Singles Virtual application",
   "main": "index.js",
   "private": true,
+  "homepage": "https://flirting-singles-virtual.web.app",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -96,7 +97,7 @@
     "types/uuid": "^9.0.1",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.28.0",
-    "react-scripts": "^0.0.0",
+    "react-scripts": "^5.0.1",
     "source-map-explorer": "^2.5.2"
   },
   "proxy": "http://localhost:5000"

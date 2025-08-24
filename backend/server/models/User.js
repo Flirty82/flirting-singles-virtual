@@ -40,6 +40,16 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    // Flirting Singles specific fields
+    flirtsSent: [{
+        to: { type: mongoose.Schema.Types.Object, ref: 'User' },
+        message: String,
+        receivedAt: { type: Date, default: Date.now },
+        isRead: { type: Boolean, default: false }
+    }],
+    blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    favoriteUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
     lastSeen: {
         type: Date,
         default: Date.now
@@ -47,6 +57,24 @@ const userSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// Virtual for full name
+userSchema.virtual('fullName').get(function() {
+    return '${this.profile.firstName} ${this.profile.lastName}'.trim();
+
+});
+
+// Method to check if user can accesss features
+userSchema.methods.canAccess = function(requireMembership) {
+    const membershipLevels = { free: 0, gold: 1, platinum: 2, diamond: 3 };
+    return membershipLevels[this.membership]
+};
+
+// Method to check if membership is active
+userSchema.methods.isMembershipActive = function() {
+    if (this.membership === 'free') return true;
+    return this.membershipExpiry && this.membership > new DataTransfer();
+};
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

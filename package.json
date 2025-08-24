@@ -2,17 +2,36 @@
     "name": "flirting-singles-virtual",
     "version": "1.0.0",
     "description": "Online dating and social networking platform",
-    "main": "index.js",
+    "main": "server/server.js",
     "private": true,
     "scripts": {
         "dev": "concurrently \"npm run server\" \"npm run client\"",
-        "server": "cs server && npm ren dev",
-        "client": "cd client && npm start",
-        "build": "cd client && npm run build",
+        "start": "npm run server:start",
+        "server": "cd server && npm run dev",
+        "client:dev": "cd client && npm start",
+        "client:build": "cd client && npm run build",
+        "client:test": "cd client && npm test",
+        "client:install": "cd client && npm install",
+        "server:dev": "cd server && npm run dev",
+        "server:start": "cd server && npm start",
+        "server:build": "cd server && npm run build",
+        "server:test": "cd server && npm test",
+        "server:install": "cd server && npm install",
+        "deploy:heroku": "git subtree push --prefix server heroku main",
+        "lint": "npm run client:lint && npm run server:lint",
+        "client:lint": "cd client && npm run lint",
+        "server-lint": "cd server && npm run lint",
+        "postinstall": "npm run install:all",
+        "build": "cd client && npm run build && npm run client && npm run server:build",
+        "test": "npm run client:test && npm run server:test",
         "install-server": "cd server && npm install",
         "install-client": "cd client && npm install",
         "install-all": "npm run install-server && npm run install-client",
         "deploy": "cd client && npm run build && firebase deploy"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Flirty82/flirting-singles-virtual.git"
     },
     "keywords": [
         "dating",
@@ -26,13 +45,12 @@
         "firebase",
         "concurrently"
     ],
-    "devDependencies": {
-        "concurrently": "^8.2.0"
-    },
-    "engines": {
-        "node": ">18.0.0",
-        "npm": ">9.0.0"
-    },
+    "bugs": {
+    "url": "https://github.com/Flirty82/flirting-singles-virtual/issues"
+},
+
     "author": "Amy Standridge/Flirting Singles",
-    "license": "MIT"
+    "license": "MIT",
+    "email": "flirtingsingles@gmail.com",
+    "website_url": "https://flirting-singles-virtual.web.app"
 }
