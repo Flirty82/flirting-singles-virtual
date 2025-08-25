@@ -1,3 +1,21 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://flirting-singles-virtual.web.app/sitemap.xml
+
+#Disallow sensitive areas (when you add them)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+
+# Allow social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+ User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

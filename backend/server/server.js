@@ -9,9 +9,72 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 const admin = require('firebase-admin');
 const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 const session = require('express-session');
 const { createServer } = require('http');
 require('dotenv').config();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Basic routes
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'Server is runnin!' });
+});
+
+// Auth routes
+app.post('/api/auth/login', (req, res) => {
+    const { email, password } = req.body;
+    // Mock authentication - replace with real auth
+    const user = {
+        id: Date.now(),
+        email: email,
+        name: email.split('@')[0],
+        membership: 'free'
+    };
+    res.json({ success: true, user });
+});
+
+app.post('api/auth/signup', (req, res) => {
+    const userData = req.body;
+    // Mock signup - replace with real auth
+    const user = {
+        id: Date.now(),
+        email: userData.email,
+        name: '${userData.firstName} ${userData.lastName}',
+        membership: 'free'
+    };
+    res.json({ success: true, user });
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('join_room', (roomId) => {
+        socket.join(roomId);
+        console.log('User ${socket.id} joined room ${roomId}');
+    });
+
+    socket.on('send_message', (data) => {
+        io.to(data.room).emit('receive_message', data);
+    });
+
+    socket.on('bingo_number_called', (data) => {
+        io.emit('bingo_number_called', data);
+});
+
+socket.on('karaoke_song_change', (data) => {
+    io.emit('karaoke_song_change', data);
+});
+
+socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+});
+});
 
 // Load environment variables
 dotenv.config();

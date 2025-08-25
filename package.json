@@ -2,11 +2,12 @@
     "name": "flirting-singles-virtual",
     "version": "1.0.0",
     "description": "Online dating and social networking platform",
-    "main": "server/server.js",
+    "main": "index.js",
     "private": true,
     "scripts": {
         "dev": "concurrently \"npm run server\" \"npm run client\"",
         "start": "npm run server:start",
+        "client": "cd client && npm start",
         "server": "cd server && npm run dev",
         "client:dev": "cd client && npm start",
         "client:build": "cd client && npm run build",
@@ -52,5 +53,8 @@
     "author": "Amy Standridge/Flirting Singles",
     "license": "MIT",
     "email": "flirtingsingles@gmail.com",
-    "website_url": "https://flirting-singles-virtual.web.app"
+    "website_url": "https://flirting-singles-virtual.web.app",
+    "devDependencies": {
+        "concurrently": "^7.6.0"
+    }
 }
