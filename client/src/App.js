@@ -1,29 +1,127 @@
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-dupe-keys */
 /*eslint-disable no-unused-vars*/
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useAuth } from './context/AuthContext';
+import { Navigate } from 'react-router-dom';
+import VirtualDating from './pages/VirtualDating';
+import './App.css';
 
 // Components
-import Header from './components/common/Header';
-import Footer from './components/common/Footer';
-import PrivateRoute from './components/common/PrivateRoute';
-import LoadingSpinner from './components/common/LoadingSpinner';
+import Navigation from 'flirting-singles-virtual/client/src/components/common/Navigation';
+import Header from 'flirting-singles-virtual/client/src/components/common/Header';
+import Footer from 'flirting-singles-virtual/client/src/components/common/Footer';
+import PrivateRoute from 'flirting-singles-virtual/client/src/components/common/PrivateRoute';
+import LoadingSpinner from 'flirting-singles-virtual/client/src/components/common/LoadingSpinner';
 
 // Pages
-import Home from '/flirting-singles-virtual/client/src/pages/Home';
-import Login from '/flirting-singles-virtual/client/src/pages/Login';
-import Signup from '/flirting-singles-virtual/client/src/pages/Signup';
-import Profile from '/flirting-singles-virtual/client/src/pages/Profile';
-import Dashboard from '/flirting-singles-virtual/client/src/pages/Dashboard';
-import Memberships from '/flirting-singles-virtual/client/src/pages/Memberships';
-import Contact from '/flirting-singles-virtual/client/src/pages/Contact';
-import Messages from '/flirting-singles/virtual/client/src/pages/Messages';
+import WelcomePage from '/flirting-singles-virtual/client/src/pages/WelcomePage';
+import LoginPage from '/flirting-singles-virtual/client/src/pages/LoginPage';
+import SignupPage from '/flirting-singles-virtual/client/src/pages/SignupPage';
+import UserProfilePage from '/flirting-singles-virtual/client/src/pages/UserProfilePage';
+import DashboardPage from '/flirting-singles-virtual/client/src/pages/DashboardPage';
+import MembershipsPage from '/flirting-singles-virtual/client/src/pages/MembershipsPage';
+import ContactPage from '/flirting-singles-virtual/client/src/pages/ContactPage';
+import ChatPage from '/flirting-singles/virtual/client/src/pages/ChatPage';
+import ActivityFeedPage from 'flirting-singles-virtual/client/src/pages/ActivityFeedPage';
+import UserProfileSetupPage from 'flirting-singles-virtual/client/src/pages/UserProfileSetupPage';
+import MessagesPage from 'flirting-singles-virtual/client/src/pages/MessagesPage';
+import BingoGamePage from 'flirting-singles-virtual/client/src/pages/BingoGamePage';
+import KaraokeGamePage from 'flirting-singles-virtual/client/src/pages/KaraokeGamePage';
+import ParanormalActivityGamePage from 'flirting-singles-virtual/client/src/pages/ParanormalActivityGamePage';
+import TruthOrDareGamePage from 'flirting-singles-virtual/client/src/pages/TruthOrDareGamePage';
+import DiscoverPage from 'flirting-singles-virtual/client/src/pages/DiscoverPage';
+import FlirtsPage from 'flirting-singles-virtual/client/src/pages/FlirtsPage';
+
+// Context
+import { AuthProvider } from 'flirting-singles-virtual/client/src/context/AuthContext';
+import { useAuth } from 'flirting-singles-virtual/client/src/hooks/useAuth';
+
+const App = () => {
+    return (
+        <AuthProvider>
+            <MainApp/>
+        </AuthProvider>
+    );
+};
+
+const MainApp = () => {
+    const [currentPage, setCurrentPage] = useState('welcome');
+    const { user, login, logout, signup, loading } = useAuth();
+
+    // Handle PayPal return (when user comes back from PayPal)
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paypalReturn = urlParams.get('paypalReturn');
+        const subscriptionId = urlParams.get('subscriptionId');
+
+        if (paypalReturn && subscriptionId) {
+            // Update user subscription based on PayPal success
+            // Verify this with backend if needed
+            alert('Payment successful! Subscription ID: ' + subscriptionId);
+            setCurrentPage('dashboard');
+            // Optionally, update user subscription status in context or global state
+        }
+    }, [user]);
+
+    const renderPage = () => {
+        switch(currentPage) {
+            case 'welcome':
+                return <WelcomePage onLogin={() => setCurrentPage('login')} onSignup={() => setCurrentPage('signup')}/>;
+            case 'login':
+                return <LoginPage onLoginSuccess={() => setCurrentPage('dashboard')} onBack={() => setCurrentPage('welcome')} Login={login}/>;
+            case 'signup':
+                return <SignupPage onSignupSuccess={() => setCurrentPage('dashboard')} onBack={() => setCurrentPage('welcome')} Signup={signup}/>;
+            case 'dashboard':
+                return <DashboardPage user={user} onLogout={() => { logout(); setCurrentPage('welcome'); }}/>;
+            case 'profile':
+                return <UserProfilePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'memberships':
+                return <MembershipsPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'contact':
+                return <ContactPage onBack={() => setCurrentPage('dashboard')}/>;
+            case 'messages':
+                return <MessagePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'virtual-dating':
+                return <VirtualDating user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'discover':
+                return <DiscoverPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'flirts':
+                return <FlirtsPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'feed':
+                return <ActivityFeedPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'chat':
+                return <ChatPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'setup-profile':
+                return <UserProfileSetupPage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'bingo':
+                return <BingoGamePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'karaoke':
+                return <KaraokeGamePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'paranormal-activity':
+                return <ParanormalActivityGamePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            case 'truth-or-dare':
+                return <TruthOrDareGamePage user={user} onBack={() => setCurrentPage('dashboard')}/>;
+            default:
+                return <WelcomePage onLogin={() => setCurrentPage('login')} onSignup={() => setCurrentPage('signup')}/>;
+        }
+    };
+
+    return (
+        <div className="app-container">
+            <Navigation currentPage={currentPage} onNavigate={setCurrentPage} user={user} logout={() => { logout(); setCurrentPage('welcome'); }}/>
+            <main className="main-content">
+                {renderPage()}</main>
+            <Footer />
+            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored"/>
+        </div>
+    )
+}
 
 // Theme Configuration
 const theme = createTheme({

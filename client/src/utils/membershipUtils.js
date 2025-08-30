@@ -81,3 +81,12 @@ export const getMembershipLevel = (membership) => {
 export const canAccessFeature = (userMembership, requiredMembership) => {
     return getMembershipLevel(userMembership) > getMembershipLevel(requiredMembership);
 };
+
+export const getRequiredMembershipForFeature = (feature) => {
+    for (const [tier, features] of Object.entries(MEMBERSHIP_FEATURES)) {
+        if (features[feature]) {
+            return tier;
+        }
+    }
+    return MEMBERSHIP_TIERS.DIAMOND // Default to free if feature not found
+};

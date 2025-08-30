@@ -1,353 +1,345 @@
-import React,  { useState, useEffect, useRef, useCallback } from 'react';
-import {
-    Eye, EyeOff, Headphones, Mic, MicOff, Video, VideoOff, Users, MessageCircle, Zap, Ghost, Skull, Moon,
-    Star, Crown, Diamond, Heart, Send, Settings, Volume2, VolumeX, Camera, Phone, Shield, Lock, Unlock, Target, Timer,
-    Bell, BellOff, Award, Gift, Sparkles, TrendingUp, RefreshCw, Play, Pause, SkipBack, MoreVertical,
-    X, Plus, Search, Filter, Info, Headset, Wifi, WifiOff, Crosshair, Flashlight, Radio, Thermometer, Activity, AlertTriangle
+import React, { useState, useEffect } from 'react';
+import { 
+  Zap, Battery, Radio, Thermometer, Camera, Flashlight, 
+  Mic, Target, Eye, Shield, Activity, AlertTriangle,
+  Volume2, Settings, RefreshCw, Power, Wifi, Play, Pause
 } from 'lucide-react';
 
-const VRParanormalGame = () => {
-    // User and VR setup
-    const [user] = useState({
-        id: 1,
-        name: 'Alex',
-        avatar: ' ',
-        membershipTier: 'platinum',
-        vrLevel: 2,
-        credits: 5000,
-        paranormalScore: 8450,
-        equipment: ['EMF_DETECTOR', 'SPIRIT_BOX', 'THERMAL_CAMERA', 'UV_LIGHT']
-    });
+const EquipmentPanel = ({ 
+  equipment, 
+  onToggleEquipment, 
+  activeEquipment, 
+  setActiveEquipment,
+  currentRoom,
+  environment 
+}) => {
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const [equipmentReadings, setEquipmentReadings] = useState({});
 
-    // VR and device state
-    const [vrSupported, setVrSupported] = useState(false);
-    const [vrConnected, setVrConnected] = useState(false);
-    const [vrHeadset, setVrHeadset] = useState(null);
-    const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
-    const [handTracking, setHandTracking] = useState({ left: null, right: null });
+  // Equipment definitions with VR-specific properties
+  const equipmentTypes = {
+    emf_detector: {
+      name: 'EMF Detector',
+      icon: '📡',
+      color: 'text-green-400',
+      bgColor: 'from-green-500/20 to-blue-500/20',
+      borderColor: 'border-green-500',
+      description: 'Detects electromagnetic field fluctuations',
+      range: 5,
+      batteryDrain: 0.1,
+      vrModel: 'emf-detector.glb'
+    },
+    spirit_box: {
+      name: 'Spirit Box',
+      icon: '📻',
+      color: 'text-purple-400',
+      bgColor: 'from-purple-500/20 to-pink-500/20',
+      borderColor: 'border-purple-500',
+      description: 'Scans radio frequencies for spirit communication',
+      range: 3,
+      batteryDrain: 0.2,
+      vrModel: 'spirit-box.glb'
+    },
+    thermal_camera: {
+      name: 'Thermal Camera',
+      icon: '📷',
+      color: 'text-blue-400',
+      bgColor: 'from-blue-500/20 to-cyan-500/20',
+      borderColor: 'border-blue-500',
+      description: 'Detects temperature anomalies and cold spots',
+      range: 8,
+      batteryDrain: 0.3,
+      vrModel: 'thermal-camera.glb'
+    },
+    uv_light: {
+      name: 'UV Light',
+      icon: '🔦',
+      color: 'text-yellow-400',
+      bgColor: 'from-yellow-500/20 to-orange-500/20',
+      borderColor: 'border-yellow-500',
+      description: 'Reveals fingerprints and other evidence',
+      range: 4,
+      batteryDrain: 0.15,
+      vrModel: 'uv-light.glb'
+    },
+    motion_sensor: {
+      name: 'Motion Sensor',
+      icon: '🎯',
+      color: 'text-red-400',
+      bgColor: 'from-red-500/20 to-orange-500/20',
+      borderColor: 'border-red-500',
+      description: 'Detects movement in the area',
+      range: 10,
+      batteryDrain: 0.05,
+      vrModel: 'motion-sensor.glb'
+    },
+    voice_recorder: {
+      name: 'Voice Recorder',
+      icon: '🎙️',
+      color: 'text-pink-400',
+      bgColor: 'from-pink-500/20 to-purple-500/20',
+      borderColor: 'border-pink-500',
+      description: 'Records Electronic Voice Phenomena (EVP)',
+      range: 6,
+      batteryDrain: 0.1,
+      vrModel: 'voice-recorder.glb'
+    },
+    camera: {
+      name: 'Photo Camera',
+      icon: '📸',
+      color: 'text-cyan-400',
+      bgColor: 'from-cyan-500/20 to-blue-500/20',
+      borderColor: 'border-cyan-500',
+      description: 'Captures photographic evidence',
+      range: 12,
+      batteryDrain: 0.25,
+      vrModel: 'photo-camera.glb'
+    },
+    crucifix: {
+      name: 'Crucifix',
+      icon: '✝️',
+      color: 'text-white',
+      bgColor: 'from-white/20 to-gray-300/20',
+      borderColor: 'border-white',
+      description: 'Prevents ghost hunts when placed',
+      range: 3,
+      batteryDrain: 0,
+      vrModel: 'crucifix.glb'
+    }
+  };
 
-    // Game state
-    const [gameState, setGameState] = useState('lobby');
-    const [currentMission, setCurrentMission] = useState({
-        id: 'HAUNTED_MANSION_001',
-        name: 'The Blackwood Manor',
-        difficulty: 'Expert',
-        maxPlayers: 6,
-        currentPlayers: 4,
-        timeLimit: 1800,
-        timeRemaining: 1800,
-        prizePool: 15000,
-        entryFee: 250,
-        phenomena: ['APPARITIONS', 'COLD_SPOTS', 'EMF_SPIKES', 'VOICE_PHENOMENA']
-    });
+  // Update equipment readings based on environment
+  useEffect(() => {
+    const updateReadings = () => {
+      const newReadings = {};
+      
+      Object.keys(equipment).forEach(key => {
+        if (equipment[key].active) {
+          const equipType = equipmentTypes[key];
+          if (!equipType) return;
 
-    // Investigation state
-    const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0, z: 0, room: 'ENTRANCE' });
-    const [currentRoom, setCurrentRoom] = useState([]);
-    const [evidence,setEvidence] = useState([]);
-    const [activeEquipment, setActiveEquipment] = useState(null);
-    const [detectedPhenomena, setDetectedPhenomena] = useState([]);
-    const [fearLevel, setFearLevel] = useState(0);
-    const [sanityLevel, setSanityLevel] = useState(100);
-    const [ghostActivity, setGhostActivity] = useState(0);
-    const [audioCues, setAudioCues] = useState([]);
+          switch (key) {
+            case 'emf_detector':
+              newReadings[key] = {
+                value: environment.emfLevel + (Math.random() * 10 - 5),
+                unit: 'mG',
+                status: environment.emfLevel > 30 ? 'ANOMALY' : 'NORMAL'
+              };
+              break;
+              
+            case 'thermal_camera':
+              newReadings[key] = {
+                value: environment.temperature + (Math.random() * 5 - 2.5),
+                unit: '°F',
+                status: environment.temperature < 50 ? 'COLD_SPOT' : 'NORMAL'
+              };
+              break;
+              
+            case 'spirit_box':
+              newReadings[key] = {
+                value: equipment[key].frequency,
+                unit: 'MHz',
+                status: Math.random() > 0.9 ? 'RESPONSE' : 'STATIC'
+              };
+              break;
+              
+            case 'motion_sensor':
+              newReadings[key] = {
+                value: environment.ghostActivity,
+                unit: '%',
+                status: environment.ghostActivity > 50 ? 'MOTION' : 'CLEAR'
+              };
+              break;
+              
+            default:
+              newReadings[key] = {
+                value: Math.random() * 100,
+                unit: '',
+                status: 'ACTIVE'
+              };
+          }
+        }
+      });
+      
+      setEquipmentReadings(newReadings);
+    };
 
-    // Team and social features
-    const [teamMembers, setTeamMembers] = useState([
-        { id: 1, name: 'Alex', avatar: ' ', tier: 'platinum', position: 'ENTRANCE', status: 'active', fearLevel: 25 },
-        { id: 2, name: 'Mark', avatar: ' ', tier: 'diamond', position: 'LIBRARY', status: 'active', fearLevel: 60  },
-        { id: 3, name: 'Winter', avatar: ' ', tier: 'platinum', position: 'BASEMENT', status: 'active', fearLevel: 15 },
-        { id: 4, name: 'Autumn', avatar: ' ', tier: 'diamond', position: 'ATTIC', status: 'active', fearLevel: 80 }
-    ]);
+    if (Object.values(equipment).some(item => item.active)) {
+      const interval = setInterval(updateReadings, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [equipment, environment]);
 
-    // Chat and voice
-    const [chatMessages, setChatMessages] = useState([
-        { id: 1, user: 'System', message: 'Welcome to Blackwood Manor. Stay together and watch your fear levels.', timestamp: new Date(), type: 'system' },
-        { id: 2, user: 'Mark', message: 'im getting EMF readings in the library', timestamp: new Date(), type: 'player' },
-        { id: 3, user: 'Winter', message: 'I hear whispers in the basement...', timestamp: new Date(), type: 'player' }
-    ]);
-    const [newMessage, setNewMessage] = useState('');
-    const [voiceChatEnabled, setVoiceChatEnabled] = useState(true);
-    const [proximityChat, setProximityChat] = useState(true);
+  const handleEquipmentToggle = (equipmentKey) => {
+    onToggleEquipment(equipmentKey);
+    if (equipment[equipmentKey].active) {
+      setActiveEquipment(null);
+    } else {
+      setActiveEquipment(equipmentKey);
+    }
+  };
 
-    // Equipment and tools
-    const [equipmentStatus, setEquipmentStatus] = useState({
-        emf_detector: { active: false, reading: 0, battery: 100 },
-        spirit_box: { active: false, channel: 1, frequency: 0, battery: 85 },
-        thermal_camera: { active: false, tempature: 68, battery: 90 },
-        uv_light: { active: false, battery: 75 },
-        motion_sensor: { active: false, triggered: false, battery: 95 },
-        voice_recorder: { active: false, recording: false, battery: 100 }
-    });
+  const getBatteryColor = (battery) => {
+    if (battery > 60) return 'text-green-400';
+    if (battery > 30) return 'text-yellow-400';
+    return 'text-red-400';
+  };
 
-    // Environmental effects
-    const [environment, setEnvironment] = useState({
-        lighting: 20,
-        temperature: 68,
-        humidity: 45,
-        emfLevel: 0,
-        soundLevel: 10,
-        presenceDetected: false
-    });
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'ANOMALY':
+      case 'COLD_SPOT':
+      case 'RESPONSE':
+      case 'MOTION':
+        return 'text-red-400';
+      case 'ACTIVE':
+        return 'text-green-400';
+      default:
+        return 'text-gray-400';
+    }
+  };
 
-    // Paranormal events
-    const [recentEvents, setRecentEvents] = useState([]);
-    const [ghostType, setGhostType] = useState('UNKNOWN');
-    const [ghostStrength, setGhostStrength] = useState(0);
+  return (
+    <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold flex items-center">
+          <Target className="w-6 h-6 mr-2 text-purple-400" />
+          Ghost Hunting Equipment
+        </h3>
+        
+        <div className="flex items-center space-x-2">
+          <div className="bg-white/10 rounded-lg px-3 py-1">
+            <span className="text-sm text-gray-300">Room: {currentRoom.replace('_', ' ')}</span>
+          </div>
+          
+          {activeEquipment && (
+            <div className="bg-green-500/20 border border-green-500/30 rounded-lg px-3 py-1">
+              <span className="text-sm text-green-400">
+                {equipmentTypes[activeEquipment]?.name} Active
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Equipment Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {Object.entries(equipment).map(([key, item]) => {
+          const equipType = equipmentTypes[key];
+          if (!equipType) return null;
+          
+          const isActive = item.active;
+          const isSelected = activeEquipment === key;
+          const reading = equipmentReadings[key];
+          
+          return (
+            <div
+              key={key}
+              className={`relative p-4 rounded-lg cursor-pointer transition-all border-2 ${
+                isActive 
+                  ? `bg-gradient-to-r ${equipType.bgColor} ${equipType.borderColor} shadow-lg` 
+                  : 'bg-black/20 border-gray-600 hover:border-purple-400'
+              } ${isSelected ? 'ring-2 ring-purple-400' : ''}`}
+              onClick={() => handleEquipmentToggle(key)}
+            >
+              {/* Equipment Icon and Status */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-3xl">{equipType.icon}</div>
+                <div className="flex flex-col items-end">
+                  <div className={`text-xs font-bold ${isActive ? 'text-green-400' : 'text-gray-500'}`}>
+                    {isActive ? 'ON' : 'OFF'}
+                  </div>
+                  {isActive && (
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mt-1"></div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Equipment Name */}
+              <div className="text-sm font-medium mb-1 text-center">
+                {equipType.name}
+              </div>
+              
+              {/* Battery Level */}
+              <div className="flex items-center justify-between text-xs mb-2">
+                <div className="flex items-center space-x-1">
+                  <Battery className="w-3 h-3" />
+                  <span className={getBatteryColor(item.battery)}>{item.battery}%</span>
+                </div>
+                
+                {isActive && reading && (
+                  <div className={`font-bold ${getStatusColor(reading.status)}`}>
+                    {reading.status}
+                  </div>
+                )}
+              </div>
+              
+              {/* Equipment Reading */}
+              {isActive && reading && (
+                <div className="bg-black/40 rounded px-2 py-1 text-center">
+                  <div className="text-lg font-bold text-white">
+                    {reading.value.toFixed(1)}{reading.unit}
+                  </div>
+                </div>
+              )}
+              
+              {/* Range Indicator */}
+              <div className="absolute top-2 left-2">
+                <div className="w-4 h-4 bg-black/60 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white">{equipType.range}m</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-    // Access control
-    const [hasRVAccess, setHasRVAccess] = useState(false);
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+      {/* Selected Equipment Details */}
+      {selectedEquipment && equipmentTypes[selectedEquipment] && (
+        <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="text-2xl">{equipmentTypes[selectedEquipment].icon}</div>
+            <div>
+              <h4 className="font-bold">{equipmentTypes[selectedEquipment].name}</h4>
+              <p className="text-sm text-gray-400">{equipmentTypes[selectedEquipment].description}</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="text-gray-400">Range:</span>
+              <span className="ml-2 font-bold">{equipmentTypes[selectedEquipment].range}m</span>
+            </div>
+            <div>
+              <span className="text-gray-400">Battery:</span>
+              <span className={`ml-2 font-bold ${getBatteryColor(equipment[selectedEquipment]?.battery || 0)}`}>
+                {equipment[selectedEquipment]?.battery || 0}%
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Status:</span>
+              <span className={`ml-2 font-bold ${equipment[selectedEquipment]?.active ? 'text-green-400' : 'text-red-400'}`}>
+                {equipment[selectedEquipment]?.active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
-    // Refs
-    const vrDisplayRef = useRef(null);
-    const gameTimerRef = useRef(null);
-    const chatEndRef = useRef(null);
-
-    // Check VR support and membership
-    useEffect(() => {
-        checkVRSupport();
-        checkMembershipAccess();
-    }, []);
-
-    // Auto-scroll chat
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      {/* Equipment Tips */}
+      <div className="mt-4 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+        <h5 className="font-medium text-blue-400 mb-2">💡 Equipment Tips:</h5>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-300">
+          <div>• EMF detectors work best near electrical sources</div>
+          <div>• Thermal cameras reveal temperature anomalies</div>
+          <div>• Spirit boxes need quiet environments</div>
+          <div>• UV lights reveal fingerprints on objects</div>
+          <div>• Motion sensors detect ghost movement</div>
+          <div>• Voice recorders capture EVP evidence</div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// Game timer
-useEffect(() => {
-    if (gameState === 'investigating') {
-        gameTimerRef.current = setInterval(() => {
-            setCurrentMission(prev => {
-                if (prev.timeRemaining < 1) {
-                    setGameState('completed');
-                    return { ...prev, timeRemaining: 0};
-                }
-                return { ...prev, timeRemaining: prev.timeRemaining - 1 };
-            });
-        }, [1000]);
-    } else {
-        clearInterval(gameTimerRef.current);
-    }
-    return () => clearInterval(gameTimerRef.current);
-}, [gameState]);
-
-// Simulate paranormal activity
-useEffect(() => {
-    if (gameState === 'investigating') {
-        const activityInterval = setInterval(() => {
-            const activityChance = Math.random();
-            if (activityChance < 0.3) {
-                const newEvent = generateParanormalEvent();
-                setRecentEvents(prev => [newEvent, ...prev].slice(0, 5));
-                setGhostActivity(prev => Math.min(prev + 10, 100));
-                setFearLevel(prev => Math.min(prev + 5, 100));
-                setSanityLevel(prev => Math.max(prev - 5, 0));
-            }
-        }, 15000);
-        return () => clearInterval(activityInterval);
-    }
-}, [gameState]);
-
-// Check VR support
-const checkVRSupport = async () => {
-    if ('xr' in navigator) {
-        try {
-            const isSupported = await navigator.xr.isSessionSupported('immersive-vr');
-            setVrSupported(isSupported);
-
-            if (isSupported) {
-                setVrHeadset('Generic VR Headset');
-            }
-        } catch (error) {
-            console.log('VR not supported:', error);
-            setVrSupported(false);
-        }
-    };
-
-    // Check Membership access
-    const checkMembershipAccess = () => {
-        if (user.membershipTier === 'platinum' || user.membershipTier === 'diamond') {
-            setHasAccess(true);
-        } else {
-            setHasVRAccess(false);
-            setShowUpgradeModal(true);
-        }
-    };
-
-    // Simulate paranormal activity
-    const simulateParanormalActivity = () => {
-        const activities = [
-            'EMF spike detected', 
-            'Tempature drop of 10 degrees',
-            'Unexplained footsteps heard', 
-            'Door slammed shut',
-            'Electronic interference',
-            'Apparition sighted',
-            'Voice phenomena captured',
-            'Object moved by unseen force'
-        ];
-
-        if (Math.random() < 0.3) {
-            const activity = activities[Math.floor(Math.random() * activities.length)];
-            setRecentEvents(prev => [activity, ...prev].slice(0, 5));
-            setGhostActivity(prev => Math.min(prev + 10, 100));
-            setFearLevel(prev => Math.min(prev + 5, 100));
-            setSanityLevel(prev => Math.max(prev - 5, 0));
-            setRecentEvents(prev => [{
-                id: Date.now(),
-                type: 'paranormal',
-                description: activity,
-                timestamp: new Date(),
-                room: currentRoom,
-                severity: Math.floor(Math.random() * 5) + 1
-            }, ...prev.slice(0, 9)]);
-
-            setEnviornment(prev => ({
-                ...prev,
-                emfLevel: Math.random() * 100,
-                temperature: prev.temperature - Math.random() * 15,
-                presenceDetected: Math.random() > 0.7
-            }));
-
-            setFearLevel(prev => Math.min(100, prev + Math.random() * 20));
-            setGhostActivity(prev => Math.min(100, prev + Math.random() * 30));
-        }
-    };
-
-    // Start VR session
-    const startVRSession = async () => {
-        if (!vrSupported) return;
-
-        try {
-            const session = await navigator.xr.requestSession('immersive-vr');
-            setVrConnected(true);
-            setGameState('briefing');
-            setVrDisplayRef(session);
-
-            const message = {
-                id: Date.now(),
-                user: 'System',
-                message: '${user.name} entered the VR session.',
-                timestamp: new Date(),
-                type: 'system'
-            };
-            setChatMessages(prev => [...prev, message]);
-        } catch (error) {
-            console.error('Failed to start VR session:', error);
-            setVrConnected(false);
-        }
-    };
-
-    // Equipment controls
-    const toggleEquipment = (equipment) => {
-        setEquipmentStatus(prev => ({
-            ...prev,
-            [equipment]: {
-                active: !prev[equipmentType].active
-            }
-        }));
-        setActiveEquipment(equipmentType);
-    };
-
-    // Chat functions
-    const sendMessage = () => {
-        if (newMessage.trim()) {
-            const message = {
-                id: Date.now(),
-                user: user.name,
-                message: newMessage,
-                timestamp: new Date(),
-                type: 'message',
-                room: currentRoom
-            };
-            setChatMessages(prev => [...prev, message]);
-        }
-    };
-
-    // Room navigation
-    const moveToRoom = (room) => {
-        setCurrentRoom(roomName);
-        setPlayerPosition(prev => ({ ...prev, room: roomName }));
-
-        const message = {
-            id: Date.now(),
-            user: 'System',
-            message: '${user.name} moved to ${roomName}',
-            timestamp: new Date(),
-            type: 'movement'
-        };
-        setChatMessages(prev => [...prev, message]);
-    };
-
-    // Format time
-    const formatTime = (second) => {
-        const mins = Math.floort(seconds / 60);
-        const secs = seconds % 60;
-        return '${mins}:#{secs.toString().padStart(2, 0)}';
-    };
-
-    // Access gate for non-premium members
-    if (!hasVRAccess) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white flex items-center justify-center">
-                <div className="text-center p-8 max-w-4xl">
-                    <div className="text-8xl mb-6"></div>
-                    <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-red-400 bg-clip-text text-transparent">
-                        VR Paranormal Investigation
-                    </h1>
-                    <p className="text-xl text-gray-300 mb-8">
-                        VR requires Plainum or Diamond membership.
-                    </p>
-
-                    <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30 mb-8">
-                       <h3 className="text-2xl font-bold mb-6 text-purple-400">VR Gaming Benefits</h3>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                        <div className="flex items-center space-x-3">
-                            <Headset className="w-6 h-6 text-purple-400"/>
-                            <span>Immersive VR paranormal investigations</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Users className="w-6 h-6 text-blue-400"/>
-                            <span>Multiplayer ghost hunting with voice chat</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Target className="w-6 h-6 text-green-400"/>
-                            <span>Professional ghost hunting equipment</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Award className="w-6 h-6 text-yellow-400"/>
-                            <span>Exclusive VR tournaments and prizes</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Crown className="w-6 h-6 text-orange-400"/>
-                            <span>Premium haunted locations</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Gift className="w-6 h-6 text-pink-400"/>
-                            <span>VR dating experiences and social events</span>
-                        </div>
-                       </div>
-                    </div>
-
-                    <div className="space-x-4">
-                        <button className="bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105">
-                            Upgrade to Platinum - $35.00/month
-                        </button>
-                        <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105">
-                            Upgrade to Diamond - $55.00/month
-                        </button>
-                    </div>
-
-                    <button
-                       onClick={() => window.history.back()}
-                       className="block mx-auto mt-4 bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg transition-colors"
-                    >
-                        Go back
-                    </button>
-                </div>
-            </div>
-        )
-    };
-}
-
+export default EquipmentPanel;

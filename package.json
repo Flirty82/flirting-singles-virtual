@@ -2,7 +2,7 @@
     "name": "flirting-singles-virtual",
     "version": "1.0.0",
     "description": "Online dating and social networking platform",
-    "main": "index.js",
+    "main": "backend/server/server.js",
     "private": true,
     "scripts": {
         "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -46,15 +46,21 @@
         "firebase",
         "concurrently"
     ],
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=9.0.0"
+    },
     "bugs": {
-    "url": "https://github.com/Flirty82/flirting-singles-virtual/issues"
-},
-
+        "url": "https://github.com/Flirty82/flirting-singles-virtual/issues"
+    },
     "author": "Amy Standridge/Flirting Singles",
     "license": "MIT",
     "email": "flirtingsingles@gmail.com",
     "website_url": "https://flirting-singles-virtual.web.app",
     "devDependencies": {
-        "concurrently": "^7.6.0"
+        "concurrently": "^8.2.2"
+    },
+    "dependencies": {
+        "all": "^0.0.0"
     }
 }
